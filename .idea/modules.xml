@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/spring-security-estonian-id.iml" filepath="$PROJECT_DIR$/spring-security-estonian-id.iml" />
-      <module fileurl="file://$PROJECT_DIR$/spring-security-estonian-id-grailsPlugins.iml" filepath="$PROJECT_DIR$/spring-security-estonian-id-grailsPlugins.iml" />
-    </modules>
-  </component>
-</project>
