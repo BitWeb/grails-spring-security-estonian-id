@@ -1,5 +1,6 @@
 package ee.bitweb.grails.springsecurity.estonianid
 
+import groovy.util.logging.Log4j
 import wslite.soap.SOAPClient
 import wslite.soap.SOAPClientException
 import wslite.soap.SOAPFaultException
@@ -7,28 +8,12 @@ import wslite.soap.SOAPFaultException
 /**
  * Created by ivar on 12.11.15.
  */
+@Log4j
 class MobileIdAuthenticationService {
-    def serviceMethod() {
-
-    }
-
-    private String appServiceName
-    private String digiDocServiceUrl
+    String appServiceName
+    String digiDocServiceUrl
 
     private static final DIGIDOCSERVICE_WSDL_URL = 'http://www.sk.ee/DigiDocService/DigiDocService_2_3.wsdl'
-
-    MobileIdAuthenticationService(String appServiceName = '', String digiDocServiceUrl = '') {
-        if(appServiceName.length() == 0) {
-            appServiceName = 'Testimine'
-        }
-        if(digiDocServiceUrl.length() == 0) {
-            digiDocServiceUrl = "https://tsp.demo.sk.ee"
-        }
-        this.appServiceName = appServiceName
-        this.digiDocServiceUrl = digiDocServiceUrl
-        log.info('this.appServiceName: '+this.appServiceName)
-        log.info('this.digiDocServiceUrl: '+this.digiDocServiceUrl)
-    }
 
     MobileIdAuthenticationSession beginAuthentication(String phoneNo, String languageCode) {
         MobileIdAuthenticationSession authSession = new MobileIdAuthenticationSession()
@@ -42,7 +27,6 @@ class MobileIdAuthenticationService {
         }
 
         String challenge = generateChallenge()
-        log.info 'challenge: '+challenge
 
         try {
             def response = client.send() {
@@ -58,8 +42,11 @@ class MobileIdAuthenticationService {
             }
 
             if (response.MobileAuthenticateResponse.Status.text() == 'OK') {
-                authSession.userIdCode = response.MobileAuthenticateResponse.UserIDCode
                 authSession.sesscode = response.MobileAuthenticateResponse.Sesscode
+                authSession.challengeId = response.MobileAuthenticateResponse.ChallengeID
+                authSession.userIdCode = response.MobileAuthenticateResponse.UserIDCode
+                authSession.userGivenname = response.MobileAuthenticateResponse.UserGivenname
+                authSession.userSurname = response.MobileAuthenticateResponse.UserSurname
 
                 Date timeNow = new Date()
                 authSession.timeStarted = timeNow

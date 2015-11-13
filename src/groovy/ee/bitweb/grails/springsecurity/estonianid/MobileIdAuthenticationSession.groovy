@@ -5,7 +5,11 @@ package ee.bitweb.grails.springsecurity.estonianid
  */
 class MobileIdAuthenticationSession {
     String sesscode
+    String challengeId
+
     String userIdCode
+    String userGivenname
+    String userSurname
 
     Date timeStarted
     Date timePolled

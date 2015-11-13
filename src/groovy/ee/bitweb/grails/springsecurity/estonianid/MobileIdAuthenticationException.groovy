@@ -12,15 +12,15 @@ class MobileIdAuthenticationException extends AuthenticationException {
     String status = ''
     Integer errorCode = 0
 
-    MobileIdAuthenticationToken authentication
+    MobileIdAuthenticationToken token
 
-    public MobileIdAuthenticationException(String msg, MobileIdAuthenticationToken authentication, Throwable t) {
-        super(msg, t);
-        this.authentication = authentication
+    public MobileIdAuthenticationException(String msg, MobileIdAuthenticationToken token, Throwable t) {
+        super(msg, t)
+        this.token = token
     }
 
-    public MobileIdAuthenticationException(String msg, MobileIdAuthenticationToken authentication) {
-        super(msg);
-        this.authentication = authentication
+    public MobileIdAuthenticationException(String msg, MobileIdAuthenticationToken token) {
+        super(msg)
+        this.token = token
     }
 }

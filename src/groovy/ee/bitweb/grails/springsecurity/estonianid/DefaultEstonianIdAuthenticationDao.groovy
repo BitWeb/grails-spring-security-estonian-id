@@ -30,7 +30,7 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
     String estonianIdUserClassName
     String appUserClassName
 
-    String idProperty = "idCode"
+    String userEstonianIdCodeProperty
     String usernameProperty = "username"
     String rolesPropertyName
 
@@ -41,21 +41,15 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
     Object findUser(EstonianIdAuthenticationToken token) {
         Object user = null
         EstonianIdUserClass.withTransaction {
-            user = EstonianIdUserClass.findWhere((idProperty): token.userIdCode)
+            user = EstonianIdUserClass.findWhere((userEstonianIdCodeProperty): token.userIdCode)
         }
         return user
     }
 
     void fillEstonianIdUserDetails(def user, EstonianIdAuthenticationToken token) {
-        user.properties[idProperty] = token.userIdCode
-        if (usernameProperty && user.hasProperty(usernameProperty)) {
+        user.properties[userEstonianIdCodeProperty] = token.userIdCode
+        /*if (usernameProperty && user.hasProperty(usernameProperty)) {
             user.setProperty(usernameProperty, token.screenName)
-        }
-        /*if (user.hasProperty('token')) {
-            user.token = token.token
-        }
-        if (user.hasProperty('tokenSecret')) {
-            user.tokenSecret = token.tokenSecret
         }*/
     }
 
@@ -117,33 +111,21 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
         return user
     }
 
-    void updateIfNeeded(Object user, EstonianIdAuthenticationToken token) {
+    void updateIfNeeded(Object estonianIdUser, EstonianIdAuthenticationToken token) {
         EstonianIdUserClass.withTransaction {
             try {
-                if (!user.isAttached()) {
-                    user.attach()
+                if (!estonianIdUser.isAttached()) {
+                    estonianIdUser.attach()
                 }
                 boolean update = false
-                if (user.hasProperty('token')) {
-                    if (user.token != token.token) {
+                /*if (estonianIdUser.hasProperty(usernameProperty)) {
+                    if (estonianIdUser.getProperty(usernameProperty) != token.screenName) {
                         update = true
-                        user.token = token.token
+                        estonianIdUser.setProperty(usernameProperty, token.screenName)
                     }
-                }
-                if (user.hasProperty('tokenSecret')) {
-                    if (user.tokenSecret != token.tokenSecret) {
-                        update = true
-                        user.tokenSecret = token.tokenSecret
-                    }
-                }
-                if (user.hasProperty(usernameProperty)) {
-                    if (user.getProperty(usernameProperty) != token.screenName) {
-                        update = true
-                        user.setProperty(usernameProperty, token.screenName)
-                    }
-                }
+                }*/
                 if (update) {
-                    user.save()
+                    estonianIdUser.save()
                 }
             } catch (OptimisticLockingFailureException e) {
                 log.warn("Seems that user was updated in another thread (${e.message}). Skip")
@@ -167,11 +149,11 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
         return result
     }
 
-    Object getPrincipal(Object user) {
+    Object getPrincipal(Object appUser) {
         if (coreUserDetailsService) {
-            return coreUserDetailsService.createUserDetails(user, getRoles(user))
+            return coreUserDetailsService.createUserDetails(appUser, getRoles(appUser))
         }
-        return user
+        return appUser
     }
 
     Collection<GrantedAuthority> getRoles(Object user) {
@@ -242,6 +224,8 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
             EstonianIdUserClass = AppUserClass
         } else if (EstonianIdUserClass != null && AppUserClass == null) {
             AppUserClass = EstonianIdUserClass
+        } else if(EstonianIdUserClass == null && AppUserClass == null) {
+
         }
         log.debug("EstonianId Authentication Dao is ready.")
     }

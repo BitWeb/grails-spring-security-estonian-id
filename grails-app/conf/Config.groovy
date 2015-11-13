@@ -41,3 +41,19 @@ grails.web.url.converter = 'hyphenated'
 grails.plugin.springsecurity.securityConfigType = "Annotation"
 grails.plugin.springsecurity.rejectIfNoRule = false
 grails.plugin.springsecurity.fii.rejectPublicInvocations = false
+
+// Added by the Spring Security Core plugin:
+grails.plugin.springsecurity.userLookup.userDomainClassName = 'ee.bitweb.TestUser'
+grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'ee.bitweb.TestUserTestRole'
+grails.plugin.springsecurity.authority.className = 'ee.bitweb.TestRole'
+grails.plugin.springsecurity.controllerAnnotations.staticRules = [
+	'/':                ['permitAll'],
+	'/index':           ['permitAll'],
+	'/index.gsp':       ['permitAll'],
+	'/assets/**':       ['permitAll'],
+	'/**/js/**':        ['permitAll'],
+	'/**/css/**':       ['permitAll'],
+	'/**/images/**':    ['permitAll'],
+	'/**/favicon.ico':  ['permitAll']
+]
+

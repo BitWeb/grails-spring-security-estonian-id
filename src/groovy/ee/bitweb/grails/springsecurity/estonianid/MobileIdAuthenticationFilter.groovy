@@ -32,10 +32,6 @@ class MobileIdAuthenticationFilter extends GenericFilterBean implements Applicat
     AuthenticationSuccessHandler authenticationSuccessHandler
     AuthenticationFailureHandler authenticationFailureHandler
 
-    MobileIdAuthenticationFilter() {
-        log.info('MobileIdAuthenticationFilter construct')
-    }
-
     @Override
     void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)  throws IOException,
             ServletException {
@@ -45,12 +41,11 @@ class MobileIdAuthenticationFilter extends GenericFilterBean implements Applicat
         // If the request URI doesn't contain the filterProcessesUrl,
         // it isn't a request that should be handled by this filter
         if(!request.getRequestURI().contains(filterProcessesUrl)) {
-            log.info 'filterProcessesUrl(\''+filterProcessesUrl+'\') doesn\'t match with \''+request.getRequestURI()+'\''
             chain.doFilter(request, response)
             return
         }
 
-        logger.debug('Request requires mobileId authentication')
+        log.debug('Request requires mobileId authentication')
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication()
 
@@ -60,9 +55,11 @@ class MobileIdAuthenticationFilter extends GenericFilterBean implements Applicat
                 return
             }
             //sessionAuthenticationStrategy.onAuthentication(authentication, request, response)
-
-        } catch(MobileIdAuthenticationException ex) {
+        } catch(MobileIdAuthenticationOutstandingException ex) {
             insufficientAuthentication(request, response, ex)
+            return
+        } catch(MobileIdAuthenticationException ex) {
+            unsuccessfulAuthentication(request, response, ex)
             return
         } catch(AuthenticationException ex) {
             unsuccessfulAuthentication(request, response, ex)
@@ -73,7 +70,7 @@ class MobileIdAuthenticationFilter extends GenericFilterBean implements Applicat
     }
 
     public Authentication attemptAuthentication(HttpServletRequest request, MobileIdAuthenticationToken token) throws AuthenticationException {
-        log.info 'attempting authentication'
+        log.debug 'attempting authentication'
 
         if(token == null) {
             String phoneNo = obtainPhoneNo(request)?.trim()
@@ -84,7 +81,7 @@ class MobileIdAuthenticationFilter extends GenericFilterBean implements Applicat
     }
 
     private void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        logger.debug("Successfully authenticated with mobileId authentication: " + authentication)
+        log.debug("Successfully authenticated with mobileId authentication: " + authentication)
 
         // When a populated Authentication object is placed in the SecurityContextHolder,
         // the user is authenticated.
@@ -97,13 +94,13 @@ class MobileIdAuthenticationFilter extends GenericFilterBean implements Applicat
 
     private void insufficientAuthentication(HttpServletRequest request, HttpServletResponse response, MobileIdAuthenticationException ex) {
         SecurityContextHolder.getContext().setAuthentication(ex.authentication)
-        logger.debug('mobileId authentication insufficient: ' + ex.toString())
+        log.debug('mobileId authentication insufficient: ' + ex.toString())
         authenticationFailureHandler.onAuthenticationFailure(request, response, ex)
     }
 
     private void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) {
         SecurityContextHolder.clearContext()
-        logger.debug('mobileId authentication failed: ' + ex.toString())
+        log.debug('mobileId authentication failed: ' + ex.toString())
         authenticationFailureHandler.onAuthenticationFailure(request, response, ex)
     }
 

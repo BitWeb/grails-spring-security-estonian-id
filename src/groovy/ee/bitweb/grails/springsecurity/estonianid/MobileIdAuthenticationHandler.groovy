@@ -29,25 +29,16 @@ class MobileIdAuthenticationHandler implements AuthenticationSuccessHandler, Aut
         MobileIdAuthenticationToken token = mIdEx.authentication
         MobileIdAuthenticationSession authSession = token.authSession
 
-        JSON json = new JSON([test: 'xxx'])
+        JSON json = new JSON([errorCode: authSession.errorCode, status: authSession.status, challengeId: authSession.challengeId])
         json.render(response)
     }
 
     void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         MobileIdAuthenticationToken token = (MobileIdAuthenticationToken)authentication
+        MobileIdAuthenticationSession authSession = token.authSession
 
-        /*Map data = [authenticated: true, uid: token.uid, roles: token.authorities?.collect { GrantedAuthority it -> it.authority }]
-        if (token.principal instanceof UserDetails) {
-            data.username = ((UserDetails)token.principal).username
-            data.enabled = ((UserDetails)token.principal).enabled
-        }
-        data = callAuthServiceOnJsonSuccess(data, authentication)
-        JSON json = new JSON(data)
-        if (useJsonp) {
-            renderAsJSONP(json, request, response)
-        } else {
-            json.render(response)
-        }*/
+        JSON json = new JSON([errorCode: authSession.errorCode, status: authSession.status, challengeId: authSession.challengeId])
+        json.render(response)
     }
 }

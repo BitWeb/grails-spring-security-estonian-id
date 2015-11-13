@@ -1,5 +1,7 @@
+import ee.bitweb.grails.springsecurity.estonianid.IdCardAuthenticationHandler
 import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationHandler
 import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationFilter
+import ee.bitweb.grails.springsecurity.estonianid.IdCardAuthenticationService
 import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationService
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
@@ -49,7 +51,7 @@ Brief summary/description of the plugin.
 //    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]
 
     // Online location of the plugin's browseable source code.
-//    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
+    def scm = [ url: "https://github.com/BitWeb/grails-spring-security-estonian-id" ]
 
     def loadAfter = ['springSecurityCore']
 
@@ -75,11 +77,13 @@ Brief summary/description of the plugin.
         if (estonianIdDaoName == null) {
             estonianIdDaoName = 'estonianIdAuthenticationDao'
             estonianIdAuthenticationDao(DefaultEstonianIdAuthenticationDao) {
-                estonianIdUserClassName = null//conf.estonianId.domain.classname
-                appUserConnectionPropertyName = null//conf.estonianId.domain.connectionPropertyName
+                estonianIdUserClassName = conf.estonianId.domain.estonianIdUserClassName
+                appUserConnectionPropertyName = conf.estonianId.domain.connectionPropertyName
 
-                appUserClassName = null//conf.userLookup.userDomainClassName
-                rolesPropertyName = null//conf.userLookup.authoritiesPropertyName
+                userEstonianIdCodeProperty = conf.estonianId.domain.userEstonianIdCodeProperty
+
+                appUserClassName = conf.userLookup.userDomainClassName
+                rolesPropertyName = conf.userLookup.authoritiesPropertyName
 
                 coreUserDetailsService = ref('userDetailsService')
                 grailsApplication = ref('grailsApplication')
@@ -88,7 +92,16 @@ Brief summary/description of the plugin.
             }
         }
 
+        estonianIdCardAuthenticationService(IdCardAuthenticationService) {
+            digiDocServiceUrl = conf.estonianId.digiDocServiceUrl
+        }
+
         estonianMobileIdAuthenticationService(MobileIdAuthenticationService) {
+            digiDocServiceUrl = conf.estonianId.digiDocServiceUrl
+            appServiceName = conf.estonianId.digiDocServiceAppServiceName
+        }
+
+        estonianIdCardAuthenticationHandler(IdCardAuthenticationHandler) {
 
         }
 
@@ -97,7 +110,8 @@ Brief summary/description of the plugin.
         }
 
         estonianIdCardAuthenticationProvider(IdCardAuthenticationProvider) {
-            //estonianIdCardAuthenticationDao = ref(estonianIdDaoName)
+            authenticationService = ref('estonianIdCardAuthenticationService')
+            authenticationDao = ref(estonianIdDaoName)
         }
         estonianMobileIdAuthenticationProvider(MobileIdAuthenticationProvider) {
             authenticationService = ref('estonianMobileIdAuthenticationService')
@@ -105,16 +119,16 @@ Brief summary/description of the plugin.
         }
 
         estonianIdCardAuthenticationFilter(IdCardAuthenticationFilter) {
-            filterProcessesUrl = 'j_spring_security_estonianid_idcard_check'
-            authenticationSuccessHandler = ref('authenticationSuccessHandler')
-            authenticationFailureHandler = ref('estonianMobileIdAuthenticationHandler')
+            filterProcessesUrl = conf.estonianId.filter.idCardLogin.processUrl
+            authenticationSuccessHandler = ref('estonianIdCardAuthenticationHandler')
+            authenticationFailureHandler = ref('estonianIdCardAuthenticationHandler')
             authenticationManager = ref('authenticationManager')
             sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
         }
 
         estonianMobileIdAuthenticationFilter(MobileIdAuthenticationFilter) {
-            filterProcessesUrl = 'j_spring_security_estonianid_mobileid_check'
-            authenticationSuccessHandler = ref('authenticationSuccessHandler')
+            filterProcessesUrl = conf.estonianId.filter.mobileIdLogin.processUrl
+            authenticationSuccessHandler = ref('estonianMobileIdAuthenticationHandler')
             authenticationFailureHandler = ref('estonianMobileIdAuthenticationHandler')
             authenticationManager = ref('authenticationManager')
             sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')

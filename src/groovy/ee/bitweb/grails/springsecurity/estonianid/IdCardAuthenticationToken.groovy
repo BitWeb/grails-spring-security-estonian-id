@@ -1,40 +1,23 @@
 package ee.bitweb.grails.springsecurity.estonianid
 
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.authority.AuthorityUtils
+
+import java.security.cert.X509Certificate
 
 /**
  * Created by ivar on 12.11.15.
  */
-class IdCardAuthenticationToken implements Authentication {
-    Object phoneNo
+class IdCardAuthenticationToken extends EstonianIdAuthenticationToken {
+    X509Certificate userCert
 
-    Object credentials
-    Object principal
-    Object details
-
-    Collection<GrantedAuthority> authorities = []
-
-    Boolean authenticated = false
-
-    public MobileIdAuthenticationToken(String phoneNo) {
-        this.phoneNo = phoneNo
-        this.authorities << new SimpleGrantedAuthority('ROLE_USER')
+    public IdCardAuthenticationToken(Collection<? extends GrantedAuthority> authorities, X509Certificate userCert) {
+        super(authorities)
+        this.userCert = userCert
     }
 
-    @Override
-    boolean isAuthenticated() {
-        return authenticated
-    }
-
-    @Override
-    void setAuthenticated(boolean authenticated) throws IllegalArgumentException {
-        this.authenticated = authenticated
-    }
-
-    @Override
-    String getName() {
-        return ''
+    public IdCardAuthenticationToken(X509Certificate userCert) {
+        super(AuthorityUtils.NO_AUTHORITIES)
+        this.userCert = userCert
     }
 }

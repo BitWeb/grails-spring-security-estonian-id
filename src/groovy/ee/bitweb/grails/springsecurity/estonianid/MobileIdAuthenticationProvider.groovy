@@ -24,55 +24,61 @@ class MobileIdAuthenticationProvider implements AuthenticationProvider {
 
         log.info 'try authenticate'
 
-        MobileIdAuthenticationToken authentication = (MobileIdAuthenticationToken) auth
+        MobileIdAuthenticationToken token = (MobileIdAuthenticationToken) auth
 
-        if (!authentication.authSession) {
-            authentication.authSession = authenticationService.beginAuthentication(authentication.userPhoneNo, 'EST')
-            if (!authenticationService.isSessionAuthenticated(authentication.authSession)) {
-                if (authenticationService.isSessionValidForPolling(authentication.authSession)) {
-                    throw new MobileIdAuthenticationException('authentication incomplete', authentication)
+        if (!token.authSession) {
+            token.authSession = authenticationService.beginAuthentication(token.userPhoneNo, 'EST')
+            if (!authenticationService.isSessionAuthenticated(token.authSession)) {
+                if (authenticationService.isSessionValidForPolling(token.authSession)) {
+                    throw new MobileIdAuthenticationOutstandingException('authentication incomplete', token)
                 } else {
-                    throw new MobileIdAuthenticationException('authentication failed', authentication)
+                    throw new MobileIdAuthenticationException('authentication failed', token)
                 }
             }
         } else {
-            if (!authenticationService.isSessionAuthenticated(authentication.authSession)) {
-                if (authenticationService.isSessionValidForPolling(authentication.authSession)) {
-                    authenticationService.poll(authentication.authSession)
-                    if (!authenticationService.isSessionAuthenticated(authentication.authSession)) {
-                        if (authenticationService.isSessionValidForPolling(authentication.authSession)) {
-                            throw new MobileIdAuthenticationException('authentication incomplete', authentication)
+            if (!authenticationService.isSessionAuthenticated(token.authSession)) {
+                if (authenticationService.isSessionValidForPolling(token.authSession)) {
+                    authenticationService.poll(token.authSession)
+                    if (!authenticationService.isSessionAuthenticated(token.authSession)) {
+                        if (authenticationService.isSessionValidForPolling(token.authSession)) {
+                            throw new MobileIdAuthenticationOutstandingException('authentication incomplete', token)
                         } else {
-                            throw new MobileIdAuthenticationException('authentication failed', authentication)
+                            throw new MobileIdAuthenticationException('authentication failed', token)
                         }
                     }
                 } else {
-                    throw new MobileIdAuthenticationException('authentication failed', authentication)
+                    throw new MobileIdAuthenticationException('authentication failed', token)
                 }
             }
         }
 
-        authentication.setAuthenticated(true)
+        token.userIdCode = token.authSession.userIdCode
 
-        Object user = authenticationDao.findUser(authentication)
+        token.setAuthenticated(true)
 
-        if (user) {
-            authenticationDao.updateIfNeeded(user, authentication)
-        }
+        Object estonianIdUser = authenticationDao.findUser(token)
 
-        Object appUser = authenticationDao.getAppUser(user)
-        Object principal = authenticationDao.getPrincipal(appUser)
+        if (estonianIdUser) {
+            authenticationDao.updateIfNeeded(estonianIdUser, token)
 
-        authentication.details = null
-        authentication.principal = principal
+            Object appUser = authenticationDao.getAppUser(estonianIdUser)
+            Object principal = authenticationDao.getPrincipal(appUser)
 
-        if (UserDetails.isAssignableFrom(principal.class)) {
-            authentication.authorities = ((UserDetails)principal).getAuthorities()
+            token.details = null
+            token.principal = principal
+
+            if (UserDetails.isAssignableFrom(principal.class)) {
+                token = new MobileIdAuthenticationToken(((UserDetails) principal).getAuthorities(), token.userPhoneNo, token.authSession)
+                token.userIdCode = token.authSession.userIdCode
+            } else {
+                token = new MobileIdAuthenticationToken(authenticationDao.getRoles(appUser), token.userPhoneNo, token.authSession)
+                token.userIdCode = token.authSession.userIdCode
+            }
         } else {
-            authentication.authorities = authenticationDao.getRoles(appUser)
+
         }
 
-        return authentication
+        return token
     }
 
     @Override

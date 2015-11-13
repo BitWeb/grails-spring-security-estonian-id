@@ -4,34 +4,62 @@ import groovy.util.logging.Log4j
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
+import org.springframework.security.core.userdetails.UserDetails
 
 /**
  * Created by ivar on 12.11.15.
  */
 @Log4j
 class IdCardAuthenticationProvider implements AuthenticationProvider {
+
+    IdCardAuthenticationService authenticationService
+    EstonianIdAuthenticationDao authenticationDao
+
     @Override
-    Authentication authenticate(Authentication auth) throws AuthenticationException {
+    Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
         log.info 'try authenticate'
 
-        IdCardAuthenticationToken authentication = (IdCardAuthenticationToken) auth
-
-        //String questionId = authentication.questionId
-        //String guess = authentication.credentials
+        IdCardAuthenticationToken token = (IdCardAuthenticationToken) authentication
 
         try {
 
-            //mobileIdAuthenticationService.checkGuess(questionId, guess)
-            throw new MobileIdAuthenticationException('test')
+            if(!authenticationService.checkCertificate(token.userCert)) {
+                throw new IdCardAuthenticationException('Bad certificate', token)
+            }
 
         } catch (AuthenticationException authenticationException) {
 
             throw authenticationException
         }
 
-        authentication.setAuthenticated(true)
-        return authentication
+        token.setAuthenticated(true)
+
+        token.userIdCode = token.userCert.getSerialNumber()
+
+        Object estonianIdUser = authenticationDao.findUser(token)
+
+        if (estonianIdUser) {
+            authenticationDao.updateIfNeeded(estonianIdUser, token)
+
+            Object appUser = authenticationDao.getAppUser(estonianIdUser)
+            Object principal = authenticationDao.getPrincipal(appUser)
+
+            token.details = null
+            token.principal = principal
+
+            if (UserDetails.isAssignableFrom(principal.class)) {
+                token = new IdCardAuthenticationToken(((UserDetails) principal).getAuthorities(), token.userCert)
+                token.userIdCode = token.userCert.getSerialNumber()
+            } else {
+                token = new IdCardAuthenticationToken(authenticationDao.getRoles(appUser), token.userCert)
+                token.userIdCode = token.userCert.getSerialNumber()
+            }
+        } else {
+
+        }
+
+        return token
     }
 
     @Override

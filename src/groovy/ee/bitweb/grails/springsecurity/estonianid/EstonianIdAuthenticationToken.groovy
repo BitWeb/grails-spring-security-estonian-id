@@ -2,6 +2,7 @@ package ee.bitweb.grails.springsecurity.estonianid
 
 import org.springframework.security.authentication.AbstractAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 /**
@@ -15,7 +16,7 @@ class EstonianIdAuthenticationToken extends AbstractAuthenticationToken {
     Object credentials
     Object principal
 
-    public EstonianIdAuthenticationToken() {
-        super(null)
+    public EstonianIdAuthenticationToken(Collection<? extends GrantedAuthority> authorities) {
+        super(authorities)
     }
 }

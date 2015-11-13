@@ -20,6 +20,8 @@ import javax.servlet.ServletResponse
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
+import java.security.cert.X509Certificate
+
 /**
  * Created by ivar on 12.11.15.
  */
@@ -32,10 +34,6 @@ class IdCardAuthenticationFilter extends GenericFilterBean implements Applicatio
     AuthenticationSuccessHandler authenticationSuccessHandler
     AuthenticationFailureHandler authenticationFailureHandler
 
-    IdCardAuthenticationFilter() {
-        log.info('IdCardAuthenticationFilter construct')
-    }
-
     @Override
     void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)  throws IOException,
             ServletException {
@@ -45,38 +43,38 @@ class IdCardAuthenticationFilter extends GenericFilterBean implements Applicatio
         // If the request URI doesn't contain the filterProcessesUrl,
         // it isn't a request that should be handled by this filter
         if(!request.getRequestURI().contains(filterProcessesUrl)) {
-            log.info 'filterProcessesUrl(\''+filterProcessesUrl+'\') doesn\'t match with \''+request.getRequestURI()+'\''
             chain.doFilter(request, response)
             return
         }
 
-        logger.debug('Request requires mobileId authentication')
+        logger.debug('Request requires IdCard authentication')
 
-        Authentication authentication
+        Authentication token
 
         try {
-            authentication = attemptAuthentication(request)
-            if(!authentication) {
+            token = attemptAuthentication(request)
+            if(!token) {
                 return
             }
             //sessionAuthenticationStrategy.onAuthentication(authentication, request, response)
 
-        } catch(MobileIdAuthenticationException ex) {
-            insufficientAuthentication(request, response, ex)
+        } catch(IdCardAuthenticationException ex) {
+            unsuccessfulAuthentication(request, response, ex)
             return
         } catch(AuthenticationException ex) {
             unsuccessfulAuthentication(request, response, ex)
             return
         }
 
-        successfulAuthentication(request, response, authentication)
+        successfulAuthentication(request, response, token)
     }
 
     public Authentication attemptAuthentication(HttpServletRequest request) throws AuthenticationException {
-        log.info 'attempting authentication'
+        log.debug 'attempting authentication'
 
-        String phoneNo = obtainPhoneNo(request)?.trim()
-        MobileIdAuthenticationToken token = new MobileIdAuthenticationToken(phoneNo)
+        X509Certificate cert = obtainCert(request)
+
+        IdCardAuthenticationToken token = new IdCardAuthenticationToken(cert)
         return this.getAuthenticationManager().authenticate(token)
     }
 
@@ -92,19 +90,14 @@ class IdCardAuthenticationFilter extends GenericFilterBean implements Applicatio
         authenticationSuccessHandler.onAuthenticationSuccess(request, response, authentication)
     }
 
-    private void insufficientAuthentication(HttpServletRequest request, HttpServletResponse response, MobileIdAuthenticationException ex) {
-        SecurityContextHolder.clearContext()
-        logger.debug('mobileId authentication insufficient: ' + ex.toString())
-        authenticationFailureHandler.onAuthenticationFailure(request, response, ex)
-    }
-
     private void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) {
         SecurityContextHolder.clearContext()
-        logger.debug('mobileId authentication failed: ' + ex.toString())
+        log.debug('IdCard authentication failed: ' + ex.toString())
         authenticationFailureHandler.onAuthenticationFailure(request, response, ex)
     }
 
-    private String obtainPhoneNo(HttpServletRequest request) {
-        return request.getParameter('phoneNo')
+    private X509Certificate obtainCert(HttpServletRequest request) {
+        X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate")
+        return certs[0]
     }
 }

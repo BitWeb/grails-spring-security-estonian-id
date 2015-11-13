@@ -1,4 +1,4 @@
-package spring.security.estonian.id
+package ee.bitweb
 
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -6,8 +6,8 @@ import spock.lang.Specification
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
-@TestFor(MyloginController)
-class MyloginControllerSpec extends Specification {
+@TestFor(PublicController)
+class PublicControllerSpec extends Specification {
 
     def setup() {
     }

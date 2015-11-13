@@ -1,8 +1,8 @@
 <%--
   Created by IntelliJ IDEA.
-  User: ivar
-  Date: 12.11.15
-  Time: 17:49
+  User: Ivar
+  Date: 13.11.2015
+  Time: 3:08
 --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -12,6 +12,6 @@
 </head>
 
 <body>
-EstonainIdLogin index
+${user}
 </body>
 </html>

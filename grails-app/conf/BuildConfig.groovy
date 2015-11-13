@@ -3,6 +3,10 @@ grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
 
 grails.project.fork = [
+        test: false,
+        run: false
+]
+/*grails.project.fork = [
     // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
     //  compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
 
@@ -14,7 +18,7 @@ grails.project.fork = [
     war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
     // configure settings for the Console UI JVM
     console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
-]
+]*/
 
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
@@ -47,6 +51,10 @@ grails.project.dependency.resolution = {
                 ":tomcat:7.0.55.3") {
             export = false
         }
+
+        runtime ":hibernate4:4.3.10"
+
+        compile ":fixtures:1.3"
 
         compile ':spring-security-core:2.0-RC5'
     }

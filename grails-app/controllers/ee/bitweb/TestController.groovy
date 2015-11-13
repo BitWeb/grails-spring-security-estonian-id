@@ -1,8 +1,8 @@
-package spring.security.estonian.id
+package ee.bitweb
 
 import grails.plugin.springsecurity.annotation.Secured
 
-@Secured(['ROLE_IS_AUTHENTICATED'])
+@Secured(['ROLE_TEST'])
 class TestController {
 
     def index() { }

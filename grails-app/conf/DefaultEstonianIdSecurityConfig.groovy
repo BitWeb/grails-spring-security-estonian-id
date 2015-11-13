@@ -2,38 +2,31 @@ security {
 
     estonianId {
 
-        appId = "Invalid"
-        secret = 'Invalid'
-        apiKey = 'Invalid'
-
         domain {
-            classname = 'User'
+            estonianIdUserClassName = 'ee.bitweb.TestUser'
+            userEstonianIdCodeProperty = 'userIdCode'
             connectionPropertyName = "user"
         }
 
-        useAjax = true
-        autoCheck = true
-
-        jsconf = "fbSecurity"
-
-        autoCreate {
-            enabled = true
-            roles = ['ROLE_ID']
-        }
+        digiDocServiceUrl = "https://tsp.demo.sk.ee"
+        digiDocServiceAppServiceName = "Testimine"
 
         filter {
-            json {
-                processUrl = "/j_spring_security_estonianid_json"
-                type = 'json' // or 'jsonp'
-                methods = ['POST']
+            idCardLogin {
+                processUrl = "/j_spring_security_estonianid_idcard_json"
+                type = 'json'
+                methods = ['GET','POST']
             }
-            redirect {
-                redirectFromUrl = "/j_spring_security_estonianid_redirect"
+            mobileIdLogin {
+                processUrl = "/j_spring_security_estonianid_mobileid_json"
+                type = 'json'
+                methods = ['GET','POST']
             }
-            processUrl = "/j_spring_security_estonianid_check"
-            type = 'redirect' //transparent, cookieDirect, redirect or json
-            position = 720 //see SecurityFilterPosition
-            forceLoginParameter = 'j_spring_estonianid_force'
+        }
+
+        redirect {
+            authFailUrl = "/j_spring_security_estonianid_redirect"
+            authSuccessUrl = "/test"
         }
 
         beans {
