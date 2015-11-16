@@ -5,9 +5,6 @@ import org.springframework.security.authentication.InsufficientAuthenticationExc
 
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
-
-import org.springframework.security.core.userdetails.UserDetails
-
 import groovy.util.logging.Log4j
 
 /**
@@ -64,16 +61,16 @@ class MobileIdAuthenticationProvider implements AuthenticationProvider {
             Object appUser = authenticationDao.getAppUser(estonianIdUser)
             Object principal = authenticationDao.getPrincipal(appUser)
 
-            token.details = null
-            token.principal = principal
-
-            if (UserDetails.isAssignableFrom(principal.class)) {
-                token = new MobileIdAuthenticationToken(((UserDetails) principal).getAuthorities(), token.userPhoneNo, token.authSession)
+            if (EstonianIdUserDetails.isAssignableFrom(principal.class)) {
+                token = new MobileIdAuthenticationToken(((EstonianIdUserDetails) principal).getAuthorities(), token.userPhoneNo, token.authSession)
                 token.userIdCode = token.authSession.userIdCode
             } else {
                 token = new MobileIdAuthenticationToken(authenticationDao.getRoles(appUser), token.userPhoneNo, token.authSession)
                 token.userIdCode = token.authSession.userIdCode
             }
+
+            token.details = null
+            token.principal = principal
         } else {
 
         }

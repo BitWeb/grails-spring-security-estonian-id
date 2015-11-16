@@ -3,9 +3,14 @@ security {
     estonianId {
 
         domain {
-            estonianIdUserClassName = 'ee.bitweb.TestUser'
-            userEstonianIdCodeProperty = 'userIdCode'
+            estonianIdUserClassName = 'ee.bitweb.User'
+            userEstonianIdCodeProperty = 'idCode'
             connectionPropertyName = "user"
+
+            idCodePropertyName = 'idCode'
+            givennamePropertyName = 'givenname'
+            surnamePropertyName = 'surname'
+            screenNamePropertyName = 'name'
         }
 
         digiDocServiceUrl = "https://tsp.demo.sk.ee"

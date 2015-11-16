@@ -3,6 +3,7 @@ import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationHandler
 import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationFilter
 import ee.bitweb.grails.springsecurity.estonianid.IdCardAuthenticationService
 import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationService
+import ee.bitweb.grails.springsecurity.estonianid.EstonianIdUserDetailsService
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 
@@ -72,6 +73,10 @@ Brief summary/description of the plugin.
         // have to get again after overlaying DefaultEstonianIdSecurityConfig
         conf = SpringSecurityUtils.securityConfig
 
+        estonianIdUserDetailsService(EstonianIdUserDetailsService) {
+
+        }
+
         String estonianIdDaoName = conf?.estonianId?.dao ?: null
 
         if (estonianIdDaoName == null) {
@@ -86,6 +91,7 @@ Brief summary/description of the plugin.
                 rolesPropertyName = conf.userLookup.authoritiesPropertyName
 
                 coreUserDetailsService = ref('userDetailsService')
+                estonianIdUserDetailsService = ref('estonianIdUserDetailsService')
                 grailsApplication = ref('grailsApplication')
 
                 //defaultRoleNames = _roles

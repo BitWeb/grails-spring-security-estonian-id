@@ -18,12 +18,6 @@
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/fixtures-1.3">
-      <sourceFolder url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/fixtures-1.3/src/groovy" isTestSource="false" />
-    </content>
-    <content url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/hibernate4-4.3.10">
-      <sourceFolder url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/hibernate4-4.3.10/src/java" isTestSource="false" />
-    </content>
     <content url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/release-3.1.1">
       <sourceFolder url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/release-3.1.1/src/java" isTestSource="false" />
       <sourceFolder url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/release-3.1.1/src/groovy" isTestSource="false" />
@@ -37,10 +31,6 @@
       <sourceFolder url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/spring-security-core-2.0-RC5/grails-app/services" isTestSource="false" />
       <sourceFolder url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/spring-security-core-2.0-RC5/grails-app/taglib" isTestSource="false" />
     </content>
-    <content url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/tomcat-7.0.55.3">
-      <sourceFolder url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/tomcat-7.0.55.3/src/java" isTestSource="false" />
-      <sourceFolder url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/tomcat-7.0.55.3/src/groovy" isTestSource="false" />
-    </content>
     <content url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/webxml-1.4.1">
       <sourceFolder url="file://$USER_HOME$/.grails/2.5.1/projects/spring-security-estonian-id/plugins/webxml-1.4.1/src/groovy" isTestSource="false" />
     </content>
@@ -51,8 +41,6 @@
       <library name="Grails User Library (spring-security-estonian-id-grailsPlugins)">
         <CLASSES>
           <root url="jar://$MAVEN_REPOSITORY$/net/sf/ehcache/ehcache/2.9.0/ehcache-2.9.0.jar!/" />
-          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/security/spring-security-web/3.2.7.RELEASE/spring-security-web-3.2.7.RELEASE.jar!/" />
-          <root url="jar://$MAVEN_REPOSITORY$/org/springframework/security/spring-security-core/3.2.7.RELEASE/spring-security-core-3.2.7.RELEASE.jar!/" />
           <root url="jar://$MAVEN_REPOSITORY$/com/github/groovy-wslite/groovy-wslite/1.1.2/groovy-wslite-1.1.2.jar!/" />
           <root url="jar://$MAVEN_REPOSITORY$/cglib/cglib-nodep/2.2.2/cglib-nodep-2.2.2.jar!/" />
           <root url="jar://$MAVEN_REPOSITORY$/org/apache/tomcat/embed/tomcat-embed-core/7.0.55/tomcat-embed-core-7.0.55.jar!/" />

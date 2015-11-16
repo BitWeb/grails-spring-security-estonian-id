@@ -98,6 +98,10 @@ class IdCardAuthenticationFilter extends GenericFilterBean implements Applicatio
 
     private X509Certificate obtainCert(HttpServletRequest request) {
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate")
-        return certs[0]
+        if(certs && certs.size()) {
+            return certs[0]
+        } else {
+            return null
+        }
     }
 }

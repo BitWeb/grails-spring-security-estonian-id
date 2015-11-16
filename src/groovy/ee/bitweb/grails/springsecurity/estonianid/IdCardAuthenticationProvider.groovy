@@ -24,7 +24,7 @@ class IdCardAuthenticationProvider implements AuthenticationProvider {
 
         try {
 
-            if(!authenticationService.checkCertificate(token.userCert)) {
+            if(!token.userCert || !authenticationService.checkCertificate(token.userCert)) {
                 throw new IdCardAuthenticationException('Bad certificate', token)
             }
 
@@ -48,8 +48,8 @@ class IdCardAuthenticationProvider implements AuthenticationProvider {
             token.details = null
             token.principal = principal
 
-            if (UserDetails.isAssignableFrom(principal.class)) {
-                token = new IdCardAuthenticationToken(((UserDetails) principal).getAuthorities(), token.userCert)
+            if (EstonianIdUserDetails.isAssignableFrom(principal.class)) {
+                token = new IdCardAuthenticationToken(((EstonianIdUserDetails) principal).getAuthorities(), token.userCert)
                 token.userIdCode = token.userCert.getSerialNumber()
             } else {
                 token = new IdCardAuthenticationToken(authenticationDao.getRoles(appUser), token.userCert)

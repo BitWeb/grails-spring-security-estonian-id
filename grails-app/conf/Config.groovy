@@ -43,9 +43,9 @@ grails.plugin.springsecurity.rejectIfNoRule = false
 grails.plugin.springsecurity.fii.rejectPublicInvocations = false
 
 // Added by the Spring Security Core plugin:
-grails.plugin.springsecurity.userLookup.userDomainClassName = 'ee.bitweb.TestUser'
-grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'ee.bitweb.TestUserTestRole'
-grails.plugin.springsecurity.authority.className = 'ee.bitweb.TestRole'
+grails.plugin.springsecurity.userLookup.userDomainClassName = 'ee.bitweb.User'
+grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'ee.bitweb.UserRole'
+grails.plugin.springsecurity.authority.className = 'ee.bitweb.Role'
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/':                ['permitAll'],
 	'/index':           ['permitAll'],

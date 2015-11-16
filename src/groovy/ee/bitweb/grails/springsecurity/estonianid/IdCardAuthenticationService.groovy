@@ -7,6 +7,7 @@ import wslite.soap.SOAPFaultException
 
 import java.security.cert.X509Certificate
 
+import javax.xml.bind.DatatypeConverter
 /**
  * Created by Ivar on 13.11.2015.
  */
@@ -25,7 +26,9 @@ class IdCardAuthenticationService {
             def response = client.send() {
                 body {
                     CheckCertificate(xmlns: DIGIDOCSERVICE_WSDL_URL) {
-                        Certificate(certificate.encodeAsBase64())
+                        log.debug('-----BEGIN CERTIFICATE-----\n'+certificate.encodeAsBase64()+'\n-----END CERTIFICATE-----\n')
+                        log.debug('-----BEGIN CERTIFICATE-----\n'+DatatypeConverter.printBase64Binary(certificate.getEncoded())+'\n-----END CERTIFICATE-----\n')
+                        Certificate(DatatypeConverter.printBase64Binary(certificate.getEncoded()))
                     }
                 }
             }

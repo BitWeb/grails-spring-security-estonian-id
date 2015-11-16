@@ -24,6 +24,7 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
     GrailsApplication grailsApplication
     ApplicationContext applicationContext
     def coreUserDetailsService
+    EstonianIdUserDetailsService estonianIdUserDetailsService
 
     Class EstonianIdUserClass
     Class AppUserClass
@@ -150,8 +151,12 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
     }
 
     Object getPrincipal(Object appUser) {
-        if (coreUserDetailsService) {
-            return coreUserDetailsService.createUserDetails(appUser, getRoles(appUser))
+        if (estonianIdUserDetailsService) {
+            return estonianIdUserDetailsService.createUserDetails(appUser, getRoles(appUser))
+        } else {
+            if (coreUserDetailsService) {
+                return coreUserDetailsService.createUserDetails(appUser, getRoles(appUser))
+            }
         }
         return appUser
     }
