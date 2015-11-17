@@ -101,6 +101,7 @@ class IdCardAuthenticationFilter extends GenericFilterBean implements Applicatio
         if(certs && certs.size()) {
             return certs[0]
         } else {
+            log.debug 'cert == null ......................'
             return null
         }
     }

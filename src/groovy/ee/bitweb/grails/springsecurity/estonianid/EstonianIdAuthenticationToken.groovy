@@ -11,7 +11,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 class EstonianIdAuthenticationToken extends AbstractAuthenticationToken {
 
     String userIdCode
-    String userName
+    String userGivenname
+    String userSurname
 
     Object credentials
     Object principal

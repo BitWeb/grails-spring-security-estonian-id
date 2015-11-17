@@ -27,7 +27,7 @@ public interface EstonianIdAuthenticationDao<T> {
      * @param user current user
      * @param token fresh token
      */
-    void updateIfNeeded(T user, EstonianIdAuthenticationToken token)
+    void updateFromToken(T estonianIdUser, EstonianIdAuthenticationToken token)
 
     /**
      * @param instance of App User related to specified Twitter User (it could be same object / same instance)

@@ -83,18 +83,23 @@ Brief summary/description of the plugin.
             estonianIdDaoName = 'estonianIdAuthenticationDao'
             estonianIdAuthenticationDao(DefaultEstonianIdAuthenticationDao) {
                 estonianIdUserClassName = conf.estonianId.domain.estonianIdUserClassName
-                appUserConnectionPropertyName = conf.estonianId.domain.connectionPropertyName
 
-                userEstonianIdCodeProperty = conf.estonianId.domain.userEstonianIdCodeProperty
+                estonainIdAppUserConnectionPropertyName = conf.estonianId.domain.estonainIdAppUserConnectionPropertyName
+
+                estonainIdUserIdCodeProperty = conf.estonianId.domain.estonainIdUserIdCodeProperty
+                estonainIdUserGivennameProperty = conf.estonianId.domain.estonainIdUserGivennameProperty
+                estonainIdUserSurnameProperty = conf.estonianId.domain.estonainIdUserSurnameProperty
+                estonainIdUserScreenNameProperty = conf.estonianId.domain.estonainIdUserScreenNameProperty
 
                 appUserClassName = conf.userLookup.userDomainClassName
+
                 rolesPropertyName = conf.userLookup.authoritiesPropertyName
 
                 coreUserDetailsService = ref('userDetailsService')
                 estonianIdUserDetailsService = ref('estonianIdUserDetailsService')
                 grailsApplication = ref('grailsApplication')
 
-                //defaultRoleNames = _roles
+                defaultRoleNames = conf.estonianId.domain.defaultRoleNames
             }
         }
 
@@ -118,10 +123,14 @@ Brief summary/description of the plugin.
         estonianIdCardAuthenticationProvider(IdCardAuthenticationProvider) {
             authenticationService = ref('estonianIdCardAuthenticationService')
             authenticationDao = ref(estonianIdDaoName)
+            defaultRoleNames = conf.estonianId.domain.defaultRoleNames
+            fCreateNewUsers = conf.estonianId.domain.fCreateNewUsers
         }
         estonianMobileIdAuthenticationProvider(MobileIdAuthenticationProvider) {
             authenticationService = ref('estonianMobileIdAuthenticationService')
             authenticationDao = ref(estonianIdDaoName)
+            defaultRoleNames = conf.estonianId.domain.defaultRoleNames
+            fCreateNewUsers = conf.estonianId.domain.fCreateNewUsers
         }
 
         estonianIdCardAuthenticationFilter(IdCardAuthenticationFilter) {

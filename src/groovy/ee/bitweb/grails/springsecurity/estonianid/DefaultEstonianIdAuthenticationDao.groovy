@@ -31,68 +31,71 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
     String estonianIdUserClassName
     String appUserClassName
 
-    String userEstonianIdCodeProperty
-    String usernameProperty = "username"
+    String estonainIdAppUserConnectionPropertyName
+
+    String estonainIdUserIdCodeProperty
+    String estonainIdUserGivennameProperty
+    String estonainIdUserSurnameProperty
+    String estonainIdUserScreenNameProperty
+
     String rolesPropertyName
 
-    List<String> defaultRoleNames = ['ROLE_USER', 'ROLE_ESTONIAN_ID']
-
-    String appUserConnectionPropertyName = "user"
+    List<String> defaultRoleNames
 
     Object findUser(EstonianIdAuthenticationToken token) {
         Object user = null
         EstonianIdUserClass.withTransaction {
-            user = EstonianIdUserClass.findWhere((userEstonianIdCodeProperty): token.userIdCode)
+            user = EstonianIdUserClass.findWhere((estonainIdUserIdCodeProperty): token.userIdCode)
         }
         return user
     }
 
     void fillEstonianIdUserDetails(def user, EstonianIdAuthenticationToken token) {
-        user.properties[userEstonianIdCodeProperty] = token.userIdCode
-        /*if (usernameProperty && user.hasProperty(usernameProperty)) {
-            user.setProperty(usernameProperty, token.screenName)
-        }*/
+        user.properties[estonainIdUserIdCodeProperty] = token.userIdCode
+        user.properties[estonainIdUserGivennameProperty] = token.userGivenname
+        user.properties[estonainIdUserSurnameProperty] = token.userSurname
+        user.properties[estonainIdUserScreenNameProperty] = token.userGivenname + ' ' + token.userSurname
     }
 
     void fillAppUserDetails(def appUser, EstonianIdAuthenticationToken token) {
         def securityConf = SpringSecurityUtils.securityConfig
 
-        String username
-        username = token.userName
-
-        appUser.setProperty(securityConf.userLookup.usernamePropertyName, username)
-        //appUser.setProperty(securityConf.userLookup.passwordPropertyName, null)
-        appUser.setProperty(securityConf.userLookup.enabledPropertyName, true)
-        appUser.setProperty(securityConf.userLookup.accountExpiredPropertyName, false)
-        appUser.setProperty(securityConf.userLookup.accountLockedPropertyName, false)
-        appUser.setProperty(securityConf.userLookup.passwordExpiredPropertyName, false)
+        //
     }
 
     Object create(EstonianIdAuthenticationToken token) {
         def securityConf = SpringSecurityUtils.securityConfig
 
-        def user = null
+        def estonianIdUser = null
         def appUser = null
 
         if (isSameDomain()) {
-            user = grailsApplication.getDomainClass(EstonianIdUserClass.name).newInstance()
-            fillEstonianIdUserDetails(user, token)
-            fillAppUserDetails(user, token)
+            estonianIdUser = grailsApplication.getDomainClass(EstonianIdUserClass.name).newInstance()
+            fillEstonianIdUserDetails(estonianIdUser, token)
+            fillAppUserDetails(estonianIdUser, token)
+
+            estonianIdUser.timeCreated = new Date()
+            estonianIdUser.timeUpdated = new Date()
+
+            appUser = estonianIdUser
         } else {
-            user = grailsApplication.getDomainClass(EstonianIdUserClass.name).newInstance()
-            fillEstonianIdUserDetails(user, token)
+            estonianIdUser = grailsApplication.getDomainClass(EstonianIdUserClass.name).newInstance()
+            fillEstonianIdUserDetails(estonianIdUser, token)
 
             appUser = grailsApplication.getDomainClass(AppUserClass.name).newInstance()
             fillAppUserDetails(appUser, token)
 
+            appUser.timeCreated = new Date()
+            appUser.timeUpdated = new Date()
+
             AppUserClass.withTransaction {
                 appUser.save(flush: true, failOnError: true)
             }
-            user[appUserConnectionPropertyName] = appUser
+            estonianIdUser[estonainIdAppUserConnectionPropertyName] = appUser
         }
 
         EstonianIdUserClass.withTransaction {
-            user.save()
+            estonianIdUser.save(flush: true, failOnError: true)
         }
 
         Class<?> PersonRole = grailsApplication.getDomainClass(securityConf.userLookup.authorityJoinClassName).clazz
@@ -109,22 +112,40 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
             }
         }
 
-        return user
+        return estonianIdUser
     }
 
-    void updateIfNeeded(Object estonianIdUser, EstonianIdAuthenticationToken token) {
+    void updateFromToken(Object estonianIdUser, EstonianIdAuthenticationToken token) {
         EstonianIdUserClass.withTransaction {
             try {
                 if (!estonianIdUser.isAttached()) {
                     estonianIdUser.attach()
                 }
                 boolean update = false
-                /*if (estonianIdUser.hasProperty(usernameProperty)) {
-                    if (estonianIdUser.getProperty(usernameProperty) != token.screenName) {
+                if (estonianIdUser.hasProperty(estonainIdUserIdCodeProperty)) {
+                    if (estonianIdUser.getProperty(estonainIdUserIdCodeProperty) != token.userIdCode) {
                         update = true
-                        estonianIdUser.setProperty(usernameProperty, token.screenName)
+                        estonianIdUser.setProperty(estonainIdUserIdCodeProperty, token.userIdCode)
                     }
-                }*/
+                }
+                if (estonianIdUser.hasProperty(estonainIdUserGivennameProperty)) {
+                    if (estonianIdUser.getProperty(estonainIdUserGivennameProperty) != token.userGivenname) {
+                        update = true
+                        estonianIdUser.setProperty(estonainIdUserGivennameProperty, token.userGivenname)
+                    }
+                }
+                if (estonianIdUser.hasProperty(estonainIdUserSurnameProperty)) {
+                    if (estonianIdUser.getProperty(estonainIdUserSurnameProperty) != token.userSurname) {
+                        update = true
+                        estonianIdUser.setProperty(estonainIdUserSurnameProperty, token.userSurname)
+                    }
+                }
+                if (estonianIdUser.hasProperty(estonainIdUserScreenNameProperty)) {
+                    if (estonianIdUser.getProperty(estonainIdUserScreenNameProperty) != token.userGivenname + ' ' + token.userSurname) {
+                        update = true
+                        estonianIdUser.setProperty(estonainIdUserScreenNameProperty, token.userGivenname + ' ' + token.userSurname)
+                    }
+                }
                 if (update) {
                     estonianIdUser.save()
                 }
@@ -145,7 +166,7 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
             if (!user.isAttached()) {
                 user.attach()
             }
-            result = user.getProperty(appUserConnectionPropertyName)
+            result = user.getProperty(estonainIdAppUserConnectionPropertyName)
         }
         return result
     }

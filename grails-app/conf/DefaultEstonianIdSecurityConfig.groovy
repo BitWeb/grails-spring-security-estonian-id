@@ -4,13 +4,21 @@ security {
 
         domain {
             estonianIdUserClassName = 'ee.bitweb.User'
-            userEstonianIdCodeProperty = 'idCode'
-            connectionPropertyName = "user"
+
+            estonainIdUserIdCodeProperty = 'idCode'
+            estonainIdUserGivennameProperty = 'givenname'
+            estonainIdUserSurnameProperty = 'surname'
+            estonainIdUserScreenNameProperty = 'screenName'
+
+            estonainIdAppUserConnectionPropertyName = "user"
 
             idCodePropertyName = 'idCode'
             givennamePropertyName = 'givenname'
             surnamePropertyName = 'surname'
             screenNamePropertyName = 'name'
+
+            defaultRoleNames = ['ROLE_DEFAULT']
+            fCreateNewUsers = true
         }
 
         digiDocServiceUrl = "https://tsp.demo.sk.ee"

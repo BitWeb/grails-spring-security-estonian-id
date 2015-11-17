@@ -15,10 +15,6 @@ class EstonianIdUserDetailsService {
         String givennamePropertyName = conf.estonianId.domain.givennamePropertyName
         String surnamePropertyName = conf.estonianId.domain.surnamePropertyName
         String screenNamePropertyName = conf.estonianId.domain.screenNamePropertyName
-        String enabledPropertyName = conf.userLookup.enabledPropertyName
-        String accountExpiredPropertyName = conf.userLookup.accountExpiredPropertyName
-        String accountLockedPropertyName = conf.userLookup.accountLockedPropertyName
-        String passwordExpiredPropertyName = conf.userLookup.passwordExpiredPropertyName
 
         String idCode = user."$idCodePropertyName"
         String givenname = user."$givennamePropertyName"
