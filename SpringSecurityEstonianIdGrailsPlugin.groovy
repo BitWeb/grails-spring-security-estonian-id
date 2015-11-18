@@ -4,6 +4,8 @@ import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationFilter
 import ee.bitweb.grails.springsecurity.estonianid.IdCardAuthenticationService
 import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationService
 import ee.bitweb.grails.springsecurity.estonianid.EstonianIdUserDetailsService
+import ee.bitweb.grails.springsecurity.estonianid.DefaultEstonianIdPreAuthenticationChecks
+import ee.bitweb.grails.springsecurity.estonianid.DefaultEstonianIdPostAuthenticationChecks
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 
@@ -120,6 +122,13 @@ Brief summary/description of the plugin.
 
         }
 
+        estonianMobileIdPreAuthenticationChecks(DefaultEstonianIdPreAuthenticationChecks) {
+
+        }
+        estonianMobileIdPostAuthenticationChecks(DefaultEstonianIdPostAuthenticationChecks) {
+
+        }
+
         estonianIdCardAuthenticationProvider(IdCardAuthenticationProvider) {
             authenticationService = ref('estonianIdCardAuthenticationService')
             authenticationDao = ref(estonianIdDaoName)
@@ -131,6 +140,8 @@ Brief summary/description of the plugin.
             authenticationDao = ref(estonianIdDaoName)
             defaultRoleNames = conf.estonianId.domain.defaultRoleNames
             fCreateNewUsers = conf.estonianId.domain.fCreateNewUsers
+            preAuthenticationChecks = estonianMobileIdPreAuthenticationChecks
+            postAuthenticationChecks = estonianMobileIdPostAuthenticationChecks
         }
 
         estonianIdCardAuthenticationFilter(IdCardAuthenticationFilter) {

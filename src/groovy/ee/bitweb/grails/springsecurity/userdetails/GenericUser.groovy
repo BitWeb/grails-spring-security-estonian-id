@@ -7,13 +7,9 @@ import org.springframework.util.Assert
 /**
  * Created by ivar on 16.11.15.
  */
-class GenericUser {
+class GenericUser implements GenericUserDetails{
     private final Object id
     private final Set<GrantedAuthority> authorities
-    private final boolean accountNonExpired;
-    private final boolean accountNonLocked;
-    private final boolean credentialsNonExpired;
-    private final boolean enabled;
 
     public GenericUser(Collection<? extends GrantedAuthority> authorities) {
         this.id = null

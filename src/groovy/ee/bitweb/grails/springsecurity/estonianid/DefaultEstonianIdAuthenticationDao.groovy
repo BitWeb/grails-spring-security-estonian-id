@@ -51,10 +51,18 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
     }
 
     void fillEstonianIdUserDetails(def user, EstonianIdAuthenticationToken token) {
-        user.properties[estonainIdUserIdCodeProperty] = token.userIdCode
-        user.properties[estonainIdUserGivennameProperty] = token.userGivenname
-        user.properties[estonainIdUserSurnameProperty] = token.userSurname
-        user.properties[estonainIdUserScreenNameProperty] = token.userGivenname + ' ' + token.userSurname
+        if (user.hasProperty(estonainIdUserIdCodeProperty)) {
+            user.properties[estonainIdUserIdCodeProperty] = token.userIdCode
+        }
+        if (user.hasProperty(estonainIdUserGivennameProperty)) {
+            user.properties[estonainIdUserGivennameProperty] = token.userGivenname
+        }
+        if (user.hasProperty(estonainIdUserSurnameProperty)) {
+            user.properties[estonainIdUserSurnameProperty] = token.userSurname
+        }
+        if (user.hasProperty(estonainIdUserScreenNameProperty)) {
+            user.properties[estonainIdUserScreenNameProperty] = token.userGivenname + ' ' + token.userSurname
+        }
     }
 
     void fillAppUserDetails(def appUser, EstonianIdAuthenticationToken token) {
@@ -74,8 +82,10 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
             fillEstonianIdUserDetails(estonianIdUser, token)
             fillAppUserDetails(estonianIdUser, token)
 
-            estonianIdUser.timeCreated = new Date()
-            estonianIdUser.timeUpdated = new Date()
+            if (estonianIdUser.hasProperty('timeCreated') && estonianIdUser.hasProperty('timeUpdated')) {
+                estonianIdUser.timeCreated = new Date()
+                estonianIdUser.timeUpdated = new Date()
+            }
 
             appUser = estonianIdUser
         } else {
@@ -85,8 +95,10 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
             appUser = grailsApplication.getDomainClass(AppUserClass.name).newInstance()
             fillAppUserDetails(appUser, token)
 
-            appUser.timeCreated = new Date()
-            appUser.timeUpdated = new Date()
+            if (appUser.hasProperty('timeCreated') && appUser.hasProperty('timeUpdated')) {
+                appUser.timeCreated = new Date()
+                appUser.timeUpdated = new Date()
+            }
 
             AppUserClass.withTransaction {
                 appUser.save(flush: true, failOnError: true)

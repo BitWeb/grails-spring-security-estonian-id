@@ -11,15 +11,27 @@ class EstonianIdUserDetailsService {
 
         def conf = SpringSecurityUtils.securityConfig
 
-        String idCodePropertyName = conf.estonianId.domain.idCodePropertyName
-        String givennamePropertyName = conf.estonianId.domain.givennamePropertyName
-        String surnamePropertyName = conf.estonianId.domain.surnamePropertyName
-        String screenNamePropertyName = conf.estonianId.domain.screenNamePropertyName
+        String idCodePropertyName = conf.estonianId.domain.estonainIdUserIdCodeProperty
+        String givennamePropertyName = conf.estonianId.domain.estonainIdUserGivennameProperty
+        String surnamePropertyName = conf.estonianId.domain.estonainIdUserSurnameProperty
+        String screenNamePropertyName = conf.estonianId.domain.estonainIdUserScreenNameProperty
 
-        String idCode = user."$idCodePropertyName"
-        String givenname = user."$givennamePropertyName"
-        String surname = user."$surnamePropertyName"
-        String screenName = user."$screenNamePropertyName"
+        String idCode = ''
+        String givenname = ''
+        String surname = ''
+        String screenName = ''
+        if (user.hasProperty(idCodePropertyName)) {
+            idCode = user."$idCodePropertyName"
+        }
+        if (user.hasProperty(givennamePropertyName)) {
+            givenname = user."$givennamePropertyName"
+        }
+        if (user.hasProperty(surnamePropertyName)) {
+            surname = user."$surnamePropertyName"
+        }
+        if (user.hasProperty(screenNamePropertyName)) {
+            screenName = user."$screenNamePropertyName"
+        }
 
         new EstonianIdUserDetails(idCode, givenname, surname, screenName, authorities, user.id)
     }
