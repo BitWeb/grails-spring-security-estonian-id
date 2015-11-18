@@ -7,7 +7,7 @@ class User {
     }
 
     Long id
-    String idCode
+    String idCode2
     String name
     //String givenname
     //String surname
@@ -21,7 +21,7 @@ class User {
         version false
     }
     static constraints = {
-        idCode blank: false, nullable: false, unique: true
+        idCode2 blank: false, nullable: false, unique: true
         name blank: true, nullable: true
         //givenname blank: true, nullable: true
         //surname blank: true, nullable: true

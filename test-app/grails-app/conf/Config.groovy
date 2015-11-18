@@ -11,6 +11,7 @@
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
 
+
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
@@ -135,7 +136,7 @@ grails.web.url.converter = 'hyphenated'
 
 
 // Added by the Spring Security Core plugin:
-grails.plugin.springsecurity.userLookup.userDomainClassName = 'User'
+//grails.plugin.springsecurity.userLookup.userDomainClassName = 'User'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'UserRole'
 grails.plugin.springsecurity.authority.className = 'Role'
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
@@ -151,12 +152,13 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 
 //Extra
 grails.plugin.springsecurity.securityConfigType = "Annotation"
-grails.plugin.springsecurity.rejectIfNoRule = false
+grails.plugin.springsecurity.rejectIfNoRule = true
 grails.plugin.springsecurity.fii.rejectPublicInvocations = false
 
+/*
 //EstonianId
 grails.plugin.springsecurity.estonianId.domain.estonianIdUserClassName = 'User'
-grails.plugin.springsecurity.estonianId.domain.estonainIdUserIdCodeProperty = 'idCode'
+grails.plugin.springsecurity.estonianId.domain.estonainIdUserIdCodeProperty = 'idCode2'
 grails.plugin.springsecurity.estonianId.domain.estonainIdUserGivennameProperty = 'givenname'
 grails.plugin.springsecurity.estonianId.domain.estonainIdUserSurnameProperty = 'surname'
 grails.plugin.springsecurity.estonianId.domain.estonainIdUserScreenNameProperty = 'screenName'
@@ -167,4 +169,18 @@ grails.plugin.springsecurity.estonianId.mobileIdLang.localeToLangMap = ['et_EE':
 grails.plugin.springsecurity.estonianId.digiDocServiceUrl = "https://tsp.demo.sk.ee"
 grails.plugin.springsecurity.estonianId.digiDocServiceAppServiceName = "Testimine"
 //grails.plugin.springsecurity.estonianId.redirect.authFailUrl = "/j_spring_security_estonianid_redirect"
-//grails.plugin.springsecurity.estonianId.redirect.authSuccessUrl = "/test"
+//grails.plugin.springsecurity.estonianId.redirect.authSuccessUrl = "/test"*/
+
+def defaultConfigLocation = "configuration/${appName}-config.groovy"
+def systemConfigLocationParameter = "${appName}.config.location"
+if (System.properties[systemConfigLocationParameter]) {
+    println "Loading ${appName} configuration from: ${System.properties[systemConfigLocationParameter]}"
+    grails.config.locations = [
+            "file:" + System.properties[systemConfigLocationParameter]
+    ]
+} else {
+    println "${appName} system parameter '$systemConfigLocationParameter' is not configured. Loading ${appName} configuration from: $defaultConfigLocation"
+    grails.config.locations = [
+            "file:$defaultConfigLocation"
+    ]
+}

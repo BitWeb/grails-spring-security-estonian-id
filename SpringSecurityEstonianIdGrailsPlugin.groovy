@@ -6,6 +6,7 @@ import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationService
 import ee.bitweb.grails.springsecurity.estonianid.EstonianIdUserDetailsService
 import ee.bitweb.grails.springsecurity.estonianid.DefaultEstonianIdPreAuthenticationChecks
 import ee.bitweb.grails.springsecurity.estonianid.DefaultEstonianIdPostAuthenticationChecks
+import grails.plugin.springsecurity.ReflectionUtils
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
 
@@ -14,7 +15,7 @@ import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationFilter
 import ee.bitweb.grails.springsecurity.estonianid.IdCardAuthenticationProvider
 import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationProvider
 import ee.bitweb.grails.springsecurity.estonianid.DefaultEstonianIdAuthenticationDao
-
+import grails.util.Environment
 import groovy.util.logging.Log4j
 
 @Log4j
@@ -64,6 +65,7 @@ Brief summary/description of the plugin.
 
     def doWithSpring = {
         def conf = SpringSecurityUtils.securityConfig
+
         if (!conf) {
             println 'ERROR: There is no Spring Security configuration'
             println 'ERROR: Stop configuring Spring Security Estonian Id'
@@ -71,7 +73,9 @@ Brief summary/description of the plugin.
         }
 
         println 'Configuring Spring Security EstonianId ...'
-        SpringSecurityUtils.loadSecondaryConfig 'DefaultEstonianIdSecurityConfig'
+
+        //SpringSecurityUtils.loadSecondaryConfig 'DefaultEstonianIdSecurityConfig'
+        SpringSecurityUtils.mergeConfig(SpringSecurityUtils.securityConfig, 'DefaultEstonianIdSecurityConfig')
         // have to get again after overlaying DefaultEstonianIdSecurityConfig
         conf = SpringSecurityUtils.securityConfig
 
@@ -186,8 +190,8 @@ Brief summary/description of the plugin.
     }
 
     def onConfigChange = { event ->
-        // TODO Implement code that is executed when the project configuration changes.
-        // The event is the same as for 'onChange'.
+        println 'Updating configuring for Spring Security EstonianId'
+        SpringSecurityUtils.mergeConfig(SpringSecurityUtils.securityConfig, 'DefaultEstonianIdSecurityConfig')
     }
 
     def onShutdown = { event ->

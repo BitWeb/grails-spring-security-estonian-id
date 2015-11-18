@@ -48,7 +48,7 @@ class GenericUser implements GenericUserDetails{
     }
 
     public int hashCode() {
-        return this.idCode.hashCode();
+        return this.id.hashCode();
     }
 
     public String toString() {
