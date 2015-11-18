@@ -8,9 +8,9 @@ class BootStrap {
     def init = { servletContext ->
         log.info 'Bootstrap'
 
-        if(TestUser.count() == 0) {
+        /*if(User.count() == 0) {
             fixtureLoader.load('roles')
-        }
+        }*/
     }
     def destroy = {
     }

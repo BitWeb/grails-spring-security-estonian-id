@@ -87,7 +87,6 @@ class IdCardAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     boolean supports(Class<? extends Object> authentication) {
-        log.info authentication.getClass().getName()
         return IdCardAuthenticationToken.class.isAssignableFrom(authentication)
     }
 }

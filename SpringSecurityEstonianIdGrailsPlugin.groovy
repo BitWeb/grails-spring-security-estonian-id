@@ -147,6 +147,9 @@ Brief summary/description of the plugin.
             authenticationFailureHandler = ref('estonianMobileIdAuthenticationHandler')
             authenticationManager = ref('authenticationManager')
             sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
+            localeResolver = ref('localeResolver')
+            defaultLanguageCode = conf.estonianId.mobileIdLang.defaultLanguageCode
+            localeToLangMap = conf.estonianId.mobileIdLang.localeToLangMap
         }
 
         SpringSecurityUtils.registerProvider('estonianIdCardAuthenticationProvider')

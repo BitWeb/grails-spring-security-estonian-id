@@ -32,6 +32,10 @@ class MobileIdAuthenticationFilter extends GenericFilterBean implements Applicat
     AuthenticationSuccessHandler authenticationSuccessHandler
     AuthenticationFailureHandler authenticationFailureHandler
 
+    def localeResolver
+    String defaultLanguageCode
+    Map localeToLangMap
+
     @Override
     void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)  throws IOException,
             ServletException {
@@ -47,11 +51,11 @@ class MobileIdAuthenticationFilter extends GenericFilterBean implements Applicat
 
         log.debug('Request requires mobileId authentication')
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication()
+        Authentication token = SecurityContextHolder.getContext().getAuthentication()
 
         try {
-            authentication = attemptAuthentication(request, authentication)
-            if(!authentication) {
+            token = attemptAuthentication(request, token)
+            if(!token) {
                 return
             }
             //sessionAuthenticationStrategy.onAuthentication(authentication, request, response)
@@ -66,25 +70,31 @@ class MobileIdAuthenticationFilter extends GenericFilterBean implements Applicat
             return
         }
 
-        successfulAuthentication(request, response, authentication)
+        successfulAuthentication(request, response, token)
     }
 
     public Authentication attemptAuthentication(HttpServletRequest request, MobileIdAuthenticationToken token) throws AuthenticationException {
-        log.debug 'attempting authentication'
+        String phoneNo = obtainPhoneNo(request)?.trim()
 
         if(token == null) {
-            String phoneNo = obtainPhoneNo(request)?.trim()
             token = new MobileIdAuthenticationToken(phoneNo)
+        } else {
+            if(token.userPhoneNo != phoneNo) {
+                token = new MobileIdAuthenticationToken(phoneNo)
+            }
         }
+
+        Locale locale = localeResolver.resolveLocale(request)
+        String languageCode = defaultLanguageCode
+        if (locale && localeToLangMap.containsKey(locale.toString())) {
+            languageCode = localeToLangMap[locale.toString()]
+        }
+        token.userLanguageCode = languageCode
 
         return this.getAuthenticationManager().authenticate(token)
     }
 
     private void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        log.debug("Successfully authenticated with mobileId authentication: " + authentication)
-
-        // When a populated Authentication object is placed in the SecurityContextHolder,
-        // the user is authenticated.
         SecurityContextHolder.getContext().setAuthentication(authentication)
 
         applicationEventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, this.getClass()))
@@ -94,13 +104,11 @@ class MobileIdAuthenticationFilter extends GenericFilterBean implements Applicat
 
     private void insufficientAuthentication(HttpServletRequest request, HttpServletResponse response, MobileIdAuthenticationException ex) {
         SecurityContextHolder.getContext().setAuthentication(ex.authentication)
-        log.debug('mobileId authentication insufficient: ' + ex.toString())
         authenticationFailureHandler.onAuthenticationFailure(request, response, ex)
     }
 
     private void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) {
         SecurityContextHolder.clearContext()
-        log.debug('mobileId authentication failed: ' + ex.toString())
         authenticationFailureHandler.onAuthenticationFailure(request, response, ex)
     }
 

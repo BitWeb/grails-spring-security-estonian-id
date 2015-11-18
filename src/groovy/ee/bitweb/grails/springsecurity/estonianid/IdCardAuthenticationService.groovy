@@ -26,8 +26,6 @@ class IdCardAuthenticationService {
             def response = client.send() {
                 body {
                     CheckCertificate(xmlns: DIGIDOCSERVICE_WSDL_URL) {
-                        log.debug('-----BEGIN CERTIFICATE-----\n'+certificate.encodeAsBase64()+'\n-----END CERTIFICATE-----\n')
-                        log.debug('-----BEGIN CERTIFICATE-----\n'+DatatypeConverter.printBase64Binary(certificate.getEncoded())+'\n-----END CERTIFICATE-----\n')
                         Certificate(DatatypeConverter.printBase64Binary(certificate.getEncoded()))
                     }
                 }

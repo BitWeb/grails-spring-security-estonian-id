@@ -22,18 +22,15 @@ class MobileIdAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     Authentication authenticate(Authentication auth) throws AuthenticationException, InsufficientAuthenticationException {
-
-        log.info 'try authenticate'
-
         MobileIdAuthenticationToken token = (MobileIdAuthenticationToken) auth
 
         if (!token.authSession) {
-            token.authSession = authenticationService.beginAuthentication(token.userPhoneNo, 'EST')
+            token.authSession = authenticationService.beginAuthentication(token.userPhoneNo, token.userLanguageCode)
             if (!authenticationService.isSessionAuthenticated(token.authSession)) {
                 if (authenticationService.isSessionValidForPolling(token.authSession)) {
-                    throw new MobileIdAuthenticationOutstandingException('authentication incomplete', token)
+                    throw new MobileIdAuthenticationOutstandingException('Mobile ID authentication incomplete', token)
                 } else {
-                    throw new MobileIdAuthenticationException('authentication failed', token)
+                    throw new MobileIdAuthenticationException('Mobile ID authentication failed', token)
                 }
             }
         } else {
@@ -42,13 +39,13 @@ class MobileIdAuthenticationProvider implements AuthenticationProvider {
                     authenticationService.poll(token.authSession)
                     if (!authenticationService.isSessionAuthenticated(token.authSession)) {
                         if (authenticationService.isSessionValidForPolling(token.authSession)) {
-                            throw new MobileIdAuthenticationOutstandingException('authentication incomplete', token)
+                            throw new MobileIdAuthenticationOutstandingException('Mobile ID authentication incomplete', token)
                         } else {
-                            throw new MobileIdAuthenticationException('authentication failed', token)
+                            throw new MobileIdAuthenticationException('Mobile ID authentication failed', token)
                         }
                     }
                 } else {
-                    throw new MobileIdAuthenticationException('authentication failed', token)
+                    throw new MobileIdAuthenticationException('Mobile ID authentication failed', token)
                 }
             }
         }
@@ -79,18 +76,17 @@ class MobileIdAuthenticationProvider implements AuthenticationProvider {
             Object principal = authenticationDao.getPrincipal(appUser)
 
             if (EstonianIdUserDetails.isAssignableFrom(principal.class)) {
-                token = new MobileIdAuthenticationToken(((EstonianIdUserDetails) principal).getAuthorities(), token.userPhoneNo, token.authSession)
+                token = new MobileIdAuthenticationToken(((EstonianIdUserDetails) principal).getAuthorities(), token.userPhoneNo, token.userLanguageCode, token.authSession)
                 token.userIdCode = token.authSession.userIdCode
             } else {
-                token = new MobileIdAuthenticationToken(authenticationDao.getRoles(appUser), token.userPhoneNo, token.authSession)
+                token = new MobileIdAuthenticationToken(authenticationDao.getRoles(appUser), token.userPhoneNo, token.userLanguageCode, token.authSession)
                 token.userIdCode = token.authSession.userIdCode
             }
 
             token.details = null
             token.principal = principal
         } else {
-            /*token = new MobileIdAuthenticationToken([new SimpleGrantedAuthority(defaultRoleName)], token.userPhoneNo, token.authSession)
-            token.userIdCode = token.authSession.userIdCode*/
+            //TODO: Authentication without domain class?
         }
 
         return token
@@ -98,7 +94,6 @@ class MobileIdAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     boolean supports(Class<? extends Object> authentication) {
-        log.info authentication.getClass().getName()
         return MobileIdAuthenticationToken.class.isAssignableFrom(authentication)
     }
 }

@@ -11,16 +11,18 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 class MobileIdAuthenticationToken extends EstonianIdAuthenticationToken {
 
     String userPhoneNo
+    String userLanguageCode
     MobileIdAuthenticationSession authSession
 
-    public MobileIdAuthenticationToken(Collection<? extends GrantedAuthority> authorities, String phoneNo, MobileIdAuthenticationSession authSession) {
+    public MobileIdAuthenticationToken(Collection<? extends GrantedAuthority> authorities, String phoneNo, String userLanguageCode, MobileIdAuthenticationSession authSession) {
         super(authorities)
         this.userPhoneNo = phoneNo
         this.authSession = authSession
     }
 
-    public MobileIdAuthenticationToken(String phoneNo) {
+    public MobileIdAuthenticationToken(String phoneNo, String userLanguageCode = 'EST') {
         super(AuthorityUtils.NO_AUTHORITIES)
         this.userPhoneNo = phoneNo
+        this.userLanguageCode = userLanguageCode
     }
 }

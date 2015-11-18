@@ -79,7 +79,7 @@ class IdCardAuthenticationFilter extends GenericFilterBean implements Applicatio
     }
 
     private void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        logger.debug("Successfully authenticated with mobileId authentication: " + authentication)
+        log.debug("Successfully authenticated with mobileId authentication: " + authentication)
 
         // When a populated Authentication object is placed in the SecurityContextHolder,
         // the user is authenticated.

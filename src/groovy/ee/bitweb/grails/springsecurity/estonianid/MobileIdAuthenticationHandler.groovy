@@ -21,8 +21,6 @@ import grails.converters.JSON
 class MobileIdAuthenticationHandler implements AuthenticationSuccessHandler, AuthenticationFailureHandler {
 
     void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) throws IOException, ServletException {
-        log.info 'MobileIdAuthenticationHandler::onAuthenticationFailure'
-
         //response.status = HttpServletResponse.SC_UNAUTHORIZED
 
         MobileIdAuthenticationException mIdEx = (MobileIdAuthenticationException)ex

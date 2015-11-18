@@ -21,8 +21,8 @@ class MobileIdAuthenticationService {
         def client = new SOAPClient(digiDocServiceUrl)
         client.httpClient.sslTrustAllCerts = true
 
-        List allowedLanguageCodes = ['EST', 'ENG', 'RUS', 'LIT']
-        if(!allowedLanguageCodes.contains(languageCode)) {
+        List supportedLanguageCodes = ['EST', 'ENG', 'RUS', 'LIT']
+        if(!supportedLanguageCodes.contains(languageCode)) {
             languageCode = 'EST'
         }
 

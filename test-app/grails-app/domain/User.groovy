@@ -1,6 +1,3 @@
-/**
- * Created by ivar on 16.11.15.
- */
 class User {
     transient springSecurityService
 
@@ -18,11 +15,6 @@ class User {
     Date timeCreated
     Date timeUpdated
 
-    boolean enabled = true
-    boolean accountExpired
-    boolean accountLocked
-    boolean passwordExpired
-
     static mapping = {
         autoImport false
         table '`user`'
@@ -33,9 +25,6 @@ class User {
         name blank: true, nullable: true
         givenname blank: true, nullable: true
         surname blank: true, nullable: true
-        status blank: true, nullable: true
-        timeCreated blank: true, nullable: true
-        timeUpdated blank: true, nullable: true
     }
 
     Set<Role> getAuthorities() {

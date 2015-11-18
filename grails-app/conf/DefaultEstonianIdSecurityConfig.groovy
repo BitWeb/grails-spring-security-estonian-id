@@ -18,7 +18,13 @@ security {
             screenNamePropertyName = 'name'
 
             defaultRoleNames = ['ROLE_DEFAULT']
+
             fCreateNewUsers = true
+        }
+
+        mobileIdLang {
+            defaultLanguageCode = 'EST'
+            localeToLangMap = ['et_EE': 'EST', 'en_EE': 'ENG', 'ru_EE': 'RUS', 'lt_EE': 'LIT']
         }
 
         digiDocServiceUrl = "https://tsp.demo.sk.ee"
