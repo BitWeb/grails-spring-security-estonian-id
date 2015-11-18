@@ -12,11 +12,6 @@ security {
 
             estonainIdAppUserConnectionPropertyName = "user"
 
-            idCodePropertyName = 'idCode'
-            givennamePropertyName = 'givenname'
-            surnamePropertyName = 'surname'
-            screenNamePropertyName = 'name'
-
             defaultRoleNames = ['ROLE_DEFAULT']
 
             fCreateNewUsers = true
