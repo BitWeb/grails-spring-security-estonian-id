@@ -61,7 +61,7 @@ class IdCardAuthenticationProvider implements AuthenticationProvider {
 
         if (estonianIdUser) {
             if (!fJustCreated) {
-                authenticationDao.updateIfNeeded(estonianIdUser, token)
+                authenticationDao.updateFromToken(estonianIdUser, token)
             }
 
             Object appUser = authenticationDao.getAppUser(estonianIdUser)
@@ -77,6 +77,9 @@ class IdCardAuthenticationProvider implements AuthenticationProvider {
                 token = new IdCardAuthenticationToken(authenticationDao.getRoles(appUser), token.userCert)
                 token.userIdCode = token.userCert.getSerialNumber()
             }
+
+            token.details = null
+            token.principal = principal
         } else {
             /*token = new MobileIdAuthenticationToken([new SimpleGrantedAuthority(defaultRoleName)], token.userPhoneNo, token.authSession)
             token.userIdCode = token.authSession.userIdCode*/

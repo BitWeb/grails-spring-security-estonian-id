@@ -21,6 +21,10 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 import java.security.cert.X509Certificate
+import java.security.cert.CertificateFactory
+import javax.xml.bind.DatatypeConverter
+
+import sun.security.provider.X509Factory
 
 /**
  * Created by ivar on 12.11.15.
@@ -33,6 +37,9 @@ class IdCardAuthenticationFilter extends GenericFilterBean implements Applicatio
     ApplicationEventPublisher applicationEventPublisher
     AuthenticationSuccessHandler authenticationSuccessHandler
     AuthenticationFailureHandler authenticationFailureHandler
+
+    boolean fGetClientCertFromHeader
+    String clientCertHeaderName
 
     @Override
     void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)  throws IOException,
@@ -97,12 +104,28 @@ class IdCardAuthenticationFilter extends GenericFilterBean implements Applicatio
     }
 
     private X509Certificate obtainCert(HttpServletRequest request) {
-        X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate")
-        if(certs && certs.size()) {
-            return certs[0]
+        if(fGetClientCertFromHeader) {
+            X509Certificate cert = null
+
+            String certStr = request.getHeader(clientCertHeaderName)
+
+            if(certStr && certStr.length()) {
+                byte[] certArr = DatatypeConverter.parseBase64Binary(certStr.replaceAll(X509Factory.BEGIN_CERT, "").replaceAll(X509Factory.END_CERT, ""))
+
+                cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(certArr))
+            } else {
+                log.debug 'No client certificate'
+            }
+
+            return cert
         } else {
-            log.debug 'cert == null ......................'
-            return null
+            X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate")
+            if(certs && certs.size()) {
+                return certs[0]
+            } else {
+                log.debug 'No client certificate'
+                return null
+            }
         }
     }
 }

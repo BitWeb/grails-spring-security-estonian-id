@@ -12,6 +12,6 @@
 </head>
 
 <body>
-Index
+Indexx/ ${domainClass}
 </body>
 </html>

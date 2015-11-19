@@ -154,6 +154,8 @@ Brief summary/description of the plugin.
             authenticationFailureHandler = ref('estonianIdCardAuthenticationHandler')
             authenticationManager = ref('authenticationManager')
             sessionAuthenticationStrategy = ref('sessionAuthenticationStrategy')
+            fGetClientCertFromHeader = conf.estonianId.idCardCert.fGetClientCertFromHeader
+            clientCertHeaderName = conf.estonianId.idCardCert.clientCertHeaderName
         }
 
         estonianMobileIdAuthenticationFilter(MobileIdAuthenticationFilter) {

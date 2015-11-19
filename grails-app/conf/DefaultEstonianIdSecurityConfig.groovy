@@ -17,6 +17,11 @@ security {
             fCreateNewUsers = true
         }
 
+        idCardCert {
+            fGetClientCertFromHeader = true
+            clientCertHeaderName = 'X-Client-Certificate'
+        }
+
         mobileIdLang {
             defaultLanguageCode = 'EST'
             localeToLangMap = ['et_EE': 'EST', 'en_EE': 'ENG', 'ru_EE': 'RUS', 'lt_EE': 'LIT']
