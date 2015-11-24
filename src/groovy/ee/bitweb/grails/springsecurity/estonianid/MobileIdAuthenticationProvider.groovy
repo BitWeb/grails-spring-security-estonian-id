@@ -32,6 +32,7 @@ class MobileIdAuthenticationProvider implements AuthenticationProvider {
     Authentication authenticate(Authentication auth) throws AuthenticationException {
         MobileIdAuthenticationToken token = (MobileIdAuthenticationToken) auth
 
+        //log.info 'Mobile Id try authenticate'
         //this.preAuthenticationChecks.check(estonianIdUser);
 
         if (!token.authSession) {
@@ -63,6 +64,7 @@ class MobileIdAuthenticationProvider implements AuthenticationProvider {
         token.userIdCode = token.authSession.userIdCode
         token.userGivenname = token.authSession.userGivenname
         token.userSurname = token.authSession.userSurname
+        token.fUserAuthenticated = true
 
         token.setAuthenticated(true)
 
@@ -93,6 +95,7 @@ class MobileIdAuthenticationProvider implements AuthenticationProvider {
                 token.userIdCode = token.authSession.userIdCode
             }
 
+            token.setAuthenticated(true)
             token.details = null
             token.principal = principal
         } else {

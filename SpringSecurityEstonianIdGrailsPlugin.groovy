@@ -21,7 +21,7 @@ import groovy.util.logging.Log4j
 @Log4j
 class SpringSecurityEstonianIdGrailsPlugin {
     // the plugin version
-    def version = "0.1"
+    def version = "0.6"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.5 > *"
     // resources that are excluded from plugin packaging
