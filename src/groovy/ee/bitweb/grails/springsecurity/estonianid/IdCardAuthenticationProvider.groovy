@@ -28,10 +28,17 @@ class IdCardAuthenticationProvider implements AuthenticationProvider {
 
         IdCardAuthenticationToken token = (IdCardAuthenticationToken) authentication
 
+        String userIdCode = null
+
         try {
 
-            if (!token.userCert || !authenticationService.checkCertificate(token.userCert)) {
+            if (!token.userCert) {
                 throw new IdCardAuthenticationException('Bad certificate', token)
+            } else {
+                userIdCode = authenticationService.checkCertificate(token.userCert);
+                if(!userIdCode) {
+                    throw new IdCardAuthenticationException('Bad certificate', token)
+                }
             }
 
         } catch (AuthenticationException authenticationException) {
@@ -41,7 +48,7 @@ class IdCardAuthenticationProvider implements AuthenticationProvider {
 
         token.setAuthenticated(true)
 
-        token.userIdCode = token.userCert.getSerialNumber()
+        token.userIdCode = userIdCode
 
         Principal certPrincipal = token.userCert.getSubjectDN()
         if (X500Name.isInstance(certPrincipal)) {

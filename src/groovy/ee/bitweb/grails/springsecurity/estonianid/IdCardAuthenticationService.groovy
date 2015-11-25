@@ -18,7 +18,7 @@ class IdCardAuthenticationService {
 
     private static final DIGIDOCSERVICE_WSDL_URL = 'http://www.sk.ee/DigiDocService/DigiDocService_2_3.wsdl'
 
-    boolean checkCertificate(X509Certificate certificate) {
+    String checkCertificate(X509Certificate certificate) {
         def client = new SOAPClient(digiDocServiceUrl)
         client.httpClient.sslTrustAllCerts = true
 
@@ -33,7 +33,7 @@ class IdCardAuthenticationService {
 
             if (response.CheckCertificateResponse.Status.text() == 'GOOD') {
                 log.debug(response.CheckCertificateResponse.Status.text())
-                return true
+                return response.CheckCertificateResponse.UserIDCode.text()
             } else {
                 log.debug(response.CheckCertificateResponse.Status.text())
                 return false

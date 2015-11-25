@@ -18,18 +18,18 @@ grails {
         plugin {
                 springsecurity {
                         userLookup {
-                                userDomainClassName = 'Userxxxxx'
+                                userDomainClassName = 'User'
                                 authorityJoinClassName = 'UserRole'
                         }
                         estonianId {
 
                                 domain {
-                                        estonianIdUserClassName = 'ee.bitweb.UserxxEstonian'
+                                        estonianIdUserClassName = 'User'
 
-                                        estonainIdUserIdCodeProperty = 'idCodexx'
-                                        estonainIdUserGivennameProperty = 'givennamexx'
-                                        estonainIdUserSurnameProperty = 'surnamexx'
-                                        estonainIdUserScreenNameProperty = 'screenNamexx'
+                                        estonainIdUserIdCodeProperty = 'idCode'
+                                        estonainIdUserGivennameProperty = 'givenname'
+                                        estonainIdUserSurnameProperty = 'surname'
+                                        estonainIdUserScreenNameProperty = 'screenName'
 
                                         estonainIdAppUserConnectionPropertyName = "user"
 
