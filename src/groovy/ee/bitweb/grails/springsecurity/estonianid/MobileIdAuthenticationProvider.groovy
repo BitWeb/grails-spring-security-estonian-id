@@ -64,7 +64,6 @@ class MobileIdAuthenticationProvider implements AuthenticationProvider {
         token.userIdCode = token.authSession.userIdCode
         token.userGivenname = token.authSession.userGivenname
         token.userSurname = token.authSession.userSurname
-        token.fUserAuthenticated = true
 
         token.setAuthenticated(true)
 

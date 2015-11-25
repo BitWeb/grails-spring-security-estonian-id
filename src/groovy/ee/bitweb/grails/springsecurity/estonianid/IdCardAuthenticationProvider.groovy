@@ -42,7 +42,7 @@ class IdCardAuthenticationProvider implements AuthenticationProvider {
         token.setAuthenticated(true)
 
         token.userIdCode = token.userCert.getSerialNumber()
-        token.fUserAuthenticated = true;
+
         Principal certPrincipal = token.userCert.getSubjectDN()
         if (X500Name.isInstance(certPrincipal)) {
             token.userGivenname = certPrincipal.getGivenName()
