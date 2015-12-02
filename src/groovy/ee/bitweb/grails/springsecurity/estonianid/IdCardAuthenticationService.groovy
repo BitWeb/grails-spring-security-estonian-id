@@ -36,14 +36,14 @@ class IdCardAuthenticationService {
                 return response.CheckCertificateResponse.UserIDCode.text()
             } else {
                 log.debug(response.CheckCertificateResponse.Status.text())
-                return false
+                return null
             }
         } catch (SOAPFaultException sfe) {
             log.debug(sfe)
-            return false
+            return null
         } catch (SOAPClientException sce) {
             log.debug(sce)
-            return false
+            return null
         }
     }
 }

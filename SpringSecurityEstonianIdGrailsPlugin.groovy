@@ -21,7 +21,7 @@ import groovy.util.logging.Log4j
 @Log4j
 class SpringSecurityEstonianIdGrailsPlugin {
     // the plugin version
-    def version = "0.8"
+    def version = "0.9"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.5 > *"
     // resources that are excluded from plugin packaging
@@ -31,10 +31,10 @@ class SpringSecurityEstonianIdGrailsPlugin {
 
     // TODO Fill in these fields
     def title = "Spring Security Estonian Id Plugin" // Headline display name of the plugin
-    def author = "Your name"
-    def authorEmail = ""
+    def author = "Ivar Kängsepp"
+    def authorEmail = "ivar@bitweb.ee"
     def description = '''\
-Brief summary/description of the plugin.
+Estonian ID-card and Mobiil-ID authentication support for the Spring Security plugin.
 '''
 
     // URL to the plugin's documentation
