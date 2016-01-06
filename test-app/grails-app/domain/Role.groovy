@@ -1,9 +1,8 @@
 class Role {
 
-    public static String ROLE_CUSTOMER = 'ROLE_USER'
-    public static String ROLE_ADMIN = 'ROLE_ADMIN'
+    public static final String ROLE_CUSTOMER = 'ROLE_USER'
+    public static final String ROLE_ADMIN = 'ROLE_ADMIN'
 
-    Long id
     String authority
 
     static mapping = {

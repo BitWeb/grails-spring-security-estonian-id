@@ -9,13 +9,13 @@ eventConfigureTomcat = {tomcat ->
 //def buildroot= ConfigurationHolder.config.grails.myproject.build.path
 //def webroot  = ConfigurationHolder.config.grails.myproject.web.root
 
-//File appDir = new File(webroot);
-//context = tomcat.addWebapp(contextRoot, appDir.getAbsolutePath());
+//File appDir = new File(webroot)
+//context = tomcat.addWebapp(contextRoot, appDir.absolutePath)
 //context.reloadable = true
 
 //WebappLoader loader = new WebappLoader(tomcat.class.classLoader)
 
-//loader.addRepository(new File(buildroot).toURI().toURL().toString());
+//loader.addRepository(new File(buildroot).toURI().toURL().toString())
 //context.loader = loader
 //loader.container = context
 

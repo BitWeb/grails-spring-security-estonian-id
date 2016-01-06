@@ -3,18 +3,17 @@ package ee.bitweb.grails.springsecurity.estonianid
 import org.springframework.security.core.AuthenticationException
 
 /**
- * Created by ivar on 12.11.15.
+ * @author ivar
  */
 class IdCardAuthenticationException extends AuthenticationException {
     IdCardAuthenticationToken token
 
-    public IdCardAuthenticationException(String msg, IdCardAuthenticationToken token, Throwable t) {
-        super(msg, t);
+    IdCardAuthenticationException(String msg, IdCardAuthenticationToken token, Throwable t) {
+        super(msg, t)
         this.token = token
     }
 
-    public IdCardAuthenticationException(String msg, IdCardAuthenticationToken token) {
-        super(msg);
-        this.token = token
+    IdCardAuthenticationException(String msg, IdCardAuthenticationToken token) {
+        this(msg, token, null)
     }
 }

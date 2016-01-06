@@ -3,7 +3,7 @@
 ### Üldine kasutamine
 Välja logimiseks võiks kasutada grails-spring-security plugina LogoutController-it ning vastavaid confi seadeid
 
-Vaadetes on võimalik kasutada springsecurity taglibi. 
+Vaadetes on võimalik kasutada springsecurity taglibi.
 Näiteks:
 ```
 <sec:ifAnyGranted roles="ROLE_USER, ROLE_ADMIN">
@@ -11,7 +11,7 @@ Näiteks:
 </sec:ifAnyGranted>
 ```
 
-Controlleris peaks kasutama ee.bitweb.grails.springsecurity.GenericSecurityService service-t, mis on SpringSecurityService põhjal loodud. 
+Controlleris peaks kasutama ee.bitweb.grails.springsecurity.GenericSecurityService service-t, mis on SpringSecurityService põhjal loodud.
 Näiteks:
 ```
 @Secured(['permitAll'])
@@ -20,8 +20,8 @@ class HomeController {
     GenericSecurityService genericSecurityService
 
     def index() {
-        log.info 'current user: ' + genericSecurityService.getCurrentUser()
-        log.info 'current principal ' + genericSecurityService.getPrincipal()
+        log.info 'current user: ' + genericSecurityService.currentUser
+        log.info 'current principal ' + genericSecurityService.principal
     }
 }
 ```

@@ -1,7 +1,7 @@
 package ee.bitweb.grails.springsecurity.estonianid
 
 /**
- * Created by ivar on 12.11.15.
+ * @author ivar
  */
 class MobileIdAuthenticationSession {
     String sesscode
@@ -16,10 +16,6 @@ class MobileIdAuthenticationSession {
 
     String status = ''
     Integer errorCode = 0
-
-    String getStatus() {
-        return status
-    }
 
     Integer getError() {
         return errorCode

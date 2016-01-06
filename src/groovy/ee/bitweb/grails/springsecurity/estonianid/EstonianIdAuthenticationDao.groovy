@@ -3,9 +3,9 @@ package ee.bitweb.grails.springsecurity.estonianid
 import org.springframework.security.core.GrantedAuthority
 
 /**
- * Created by ivar on 12.11.15.
+ * @author ivar
  */
-public interface EstonianIdAuthenticationDao<T> {
+interface EstonianIdAuthenticationDao<T> {
 
     /**
      * Try to find existing user for Twitter Token (search by screen name or user id)
@@ -33,14 +33,14 @@ public interface EstonianIdAuthenticationDao<T> {
      * @param instance of App User related to specified Twitter User (it could be same object / same instance)
      * @return App User
      */
-    Object getAppUser(T user)
+    def getAppUser(T user)
 
     /**
      * Principal for Spring Security. Could be any object, but UserDetails instance is preferred
      * @param user
      * @return
      */
-    Object getPrincipal(Object user)
+    def getPrincipal(user)
 
     /**
      *

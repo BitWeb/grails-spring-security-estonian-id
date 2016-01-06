@@ -1,19 +1,17 @@
 package ee.bitweb.grails.springsecurity.estonianid
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
 import sun.security.x509.X500Name
 
 import java.security.Principal
 
 /**
- * Created by ivar on 12.11.15.
+ * @author ivar
  */
-@Log4j
+@Slf4j
 class IdCardAuthenticationProvider implements AuthenticationProvider {
 
     IdCardAuthenticationService authenticationService
@@ -21,42 +19,31 @@ class IdCardAuthenticationProvider implements AuthenticationProvider {
     List<String> defaultRoleNames
     boolean fCreateNewUsers
 
-    @Override
     Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
         log.info 'try authenticate'
 
-        IdCardAuthenticationToken token = (IdCardAuthenticationToken) authentication
+        IdCardAuthenticationToken token = authentication
 
-        String userIdCode = null
-
-        try {
-
-            if (!token.userCert) {
-                throw new IdCardAuthenticationException('Bad certificate', token)
-            } else {
-                userIdCode = authenticationService.checkCertificate(token.userCert);
-                if(!userIdCode) {
-                    throw new IdCardAuthenticationException('Bad certificate', token)
-                }
-            }
-
-        } catch (AuthenticationException authenticationException) {
-
-            throw authenticationException
+        if (!token.userCert) {
+            throw new IdCardAuthenticationException('Bad certificate', token)
         }
 
-        token.setAuthenticated(true)
+        String userIdCode = authenticationService.checkCertificate(token.userCert)
+        if(!userIdCode) {
+            throw new IdCardAuthenticationException('Bad certificate', token)
+        }
 
+        token.authenticated = true
         token.userIdCode = userIdCode
 
-        Principal certPrincipal = token.userCert.getSubjectDN()
-        if (X500Name.isInstance(certPrincipal)) {
-            token.userGivenname = certPrincipal.getGivenName()
-            token.userSurname = certPrincipal.getSurname()
+        Principal certPrincipal = token.userCert.subjectDN
+        if (certPrincipal instanceof X500Name) {
+            token.userGivenname = certPrincipal.givenName
+            token.userSurname = certPrincipal.surname
         }
 
-        Object estonianIdUser = authenticationDao.findUser(token)
+        def estonianIdUser = authenticationDao.findUser(token)
 
         boolean fJustCreated = false
 
@@ -72,21 +59,21 @@ class IdCardAuthenticationProvider implements AuthenticationProvider {
                 authenticationDao.updateFromToken(estonianIdUser, token)
             }
 
-            Object appUser = authenticationDao.getAppUser(estonianIdUser)
-            Object principal = authenticationDao.getPrincipal(appUser)
+            def appUser = authenticationDao.getAppUser(estonianIdUser)
+            def principal = authenticationDao.getPrincipal(appUser)
 
             token.details = null
             token.principal = principal
 
-            if (EstonianIdUserDetails.isAssignableFrom(principal.class)) {
-                token = new IdCardAuthenticationToken(((EstonianIdUserDetails) principal).getAuthorities(), token.userCert)
-                token.userIdCode = token.userCert.getSerialNumber()
+            if (principal instanceof EstonianIdUserDetails) {
+                token = new IdCardAuthenticationToken(principal.authorities, token.userCert)
+                token.userIdCode = token.userCert.serialNumber
             } else {
                 token = new IdCardAuthenticationToken(authenticationDao.getRoles(appUser), token.userCert)
-                token.userIdCode = token.userCert.getSerialNumber()
+                token.userIdCode = token.userCert.serialNumber
             }
 
-            token.setAuthenticated(true)
+            token.authenticated = true
             token.details = null
             token.principal = principal
         } else {
@@ -97,8 +84,7 @@ class IdCardAuthenticationProvider implements AuthenticationProvider {
         return token
     }
 
-    @Override
-    boolean supports(Class<? extends Object> authentication) {
-        return IdCardAuthenticationToken.class.isAssignableFrom(authentication)
+    boolean supports(Class<?> authentication) {
+        IdCardAuthenticationToken.isAssignableFrom(authentication)
     }
 }

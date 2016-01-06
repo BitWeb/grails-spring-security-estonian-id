@@ -1,67 +1,32 @@
-import ee.bitweb.grails.springsecurity.estonianid.IdCardAuthenticationHandler
-import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationHandler
-import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationFilter
-import ee.bitweb.grails.springsecurity.estonianid.IdCardAuthenticationService
-import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationService
-import ee.bitweb.grails.springsecurity.estonianid.EstonianIdUserDetailsService
-import ee.bitweb.grails.springsecurity.estonianid.DefaultEstonianIdPreAuthenticationChecks
+import ee.bitweb.grails.springsecurity.estonianid.DefaultEstonianIdAuthenticationDao
 import ee.bitweb.grails.springsecurity.estonianid.DefaultEstonianIdPostAuthenticationChecks
-import grails.plugin.springsecurity.ReflectionUtils
+import ee.bitweb.grails.springsecurity.estonianid.DefaultEstonianIdPreAuthenticationChecks
+import ee.bitweb.grails.springsecurity.estonianid.EstonianIdUserDetailsService
+import ee.bitweb.grails.springsecurity.estonianid.IdCardAuthenticationFilter
+import ee.bitweb.grails.springsecurity.estonianid.IdCardAuthenticationHandler
+import ee.bitweb.grails.springsecurity.estonianid.IdCardAuthenticationProvider
+import ee.bitweb.grails.springsecurity.estonianid.IdCardAuthenticationService
+import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationFilter
+import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationHandler
+import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationProvider
+import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationService
 import grails.plugin.springsecurity.SecurityFilterPosition
 import grails.plugin.springsecurity.SpringSecurityUtils
+import groovy.util.logging.Slf4j
 
-import ee.bitweb.grails.springsecurity.estonianid.IdCardAuthenticationFilter
-import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationFilter
-import ee.bitweb.grails.springsecurity.estonianid.IdCardAuthenticationProvider
-import ee.bitweb.grails.springsecurity.estonianid.MobileIdAuthenticationProvider
-import ee.bitweb.grails.springsecurity.estonianid.DefaultEstonianIdAuthenticationDao
-import grails.util.Environment
-import groovy.util.logging.Log4j
-
-@Log4j
+@Slf4j
 class SpringSecurityEstonianIdGrailsPlugin {
-    // the plugin version
     def version = "0.9"
-    // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.5 > *"
-    // resources that are excluded from plugin packaging
-    def pluginExcludes = [
-        "grails-app/views/error.gsp"
-    ]
-
-    // TODO Fill in these fields
-    def title = "Spring Security Estonian Id Plugin" // Headline display name of the plugin
+    def title = "Spring Security Estonian Id Plugin"
     def author = "Ivar Kängsepp"
     def authorEmail = "ivar@bitweb.ee"
-    def description = '''\
-Estonian ID-card and Mobiil-ID authentication support for the Spring Security plugin.
-'''
-
-    // URL to the plugin's documentation
+    def description = 'Estonian ID-card and Mobiil-ID authentication support for the Spring Security plugin.'
     def documentation = "http://grails.org/plugin/spring-security-estonian-id"
-
-    // Extra (optional) plugin metadata
-
-    // License: one of 'APACHE', 'GPL2', 'GPL3'
-//    def license = "APACHE"
-
-    // Details of company behind the plugin (if there is one)
-//    def organization = [ name: "My Company", url: "http://www.my-company.com/" ]
-
-    // Any additional developers beyond the author specified above.
-//    def developers = [ [ name: "Joe Bloggs", email: "joe@bloggs.net" ]]
-
-    // Location of the plugin's issue tracker.
-//    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]
-
-    // Online location of the plugin's browseable source code.
-    def scm = [ url: "https://github.com/BitWeb/grails-spring-security-estonian-id" ]
-
+    def license = "APACHE"
+    def issueManagement = [url: "https://github.com/BitWeb/grails-spring-security-estonian-id/issues"]
+    def scm = [url: "https://github.com/BitWeb/grails-spring-security-estonian-id"]
     def loadAfter = ['springSecurityCore']
-
-    def doWithWebDescriptor = { xml ->
-        // TODO Implement additions to web.xml (optional), this event occurs before
-    }
 
     def doWithSpring = {
         def conf = SpringSecurityUtils.securityConfig
@@ -74,14 +39,11 @@ Estonian ID-card and Mobiil-ID authentication support for the Spring Security pl
 
         println 'Configuring Spring Security EstonianId ...'
 
-        //SpringSecurityUtils.loadSecondaryConfig 'DefaultEstonianIdSecurityConfig'
         SpringSecurityUtils.mergeConfig(SpringSecurityUtils.securityConfig, 'DefaultEstonianIdSecurityConfig')
         // have to get again after overlaying DefaultEstonianIdSecurityConfig
         conf = SpringSecurityUtils.securityConfig
 
-        estonianIdUserDetailsService(EstonianIdUserDetailsService) {
-
-        }
+        estonianIdUserDetailsService(EstonianIdUserDetailsService)
 
         String estonianIdDaoName = conf?.estonianId?.dao ?: null
 
@@ -118,20 +80,13 @@ Estonian ID-card and Mobiil-ID authentication support for the Spring Security pl
             appServiceName = conf.estonianId.digiDocServiceAppServiceName
         }
 
-        estonianIdCardAuthenticationHandler(IdCardAuthenticationHandler) {
+        estonianIdCardAuthenticationHandler(IdCardAuthenticationHandler)
 
-        }
+        estonianMobileIdAuthenticationHandler(MobileIdAuthenticationHandler)
 
-        estonianMobileIdAuthenticationHandler(MobileIdAuthenticationHandler) {
+        estonianMobileIdPreAuthenticationChecks(DefaultEstonianIdPreAuthenticationChecks)
 
-        }
-
-        estonianMobileIdPreAuthenticationChecks(DefaultEstonianIdPreAuthenticationChecks) {
-
-        }
-        estonianMobileIdPostAuthenticationChecks(DefaultEstonianIdPostAuthenticationChecks) {
-
-        }
+        estonianMobileIdPostAuthenticationChecks(DefaultEstonianIdPostAuthenticationChecks)
 
         estonianIdCardAuthenticationProvider(IdCardAuthenticationProvider) {
             authenticationService = ref('estonianIdCardAuthenticationService')
@@ -177,26 +132,8 @@ Estonian ID-card and Mobiil-ID authentication support for the Spring Security pl
         println '... finished configuring Spring Security EstonianId'
     }
 
-    def doWithDynamicMethods = { ctx ->
-        // TODO Implement registering dynamic methods to classes (optional)
-    }
-
-    def doWithApplicationContext = { ctx ->
-        // TODO Implement post initialization spring config (optional)
-    }
-
-    def onChange = { event ->
-        // TODO Implement code that is executed when any artefact that this plugin is
-        // watching is modified and reloaded. The event contains: event.source,
-        // event.application, event.manager, event.ctx, and event.plugin.
-    }
-
     def onConfigChange = { event ->
         println 'Updating configuring for Spring Security EstonianId'
         SpringSecurityUtils.mergeConfig(SpringSecurityUtils.securityConfig, 'DefaultEstonianIdSecurityConfig')
-    }
-
-    def onShutdown = { event ->
-        // TODO Implement code that is executed when the application shuts down (optional)
     }
 }
