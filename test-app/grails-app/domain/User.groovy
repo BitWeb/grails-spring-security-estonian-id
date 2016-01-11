@@ -1,12 +1,11 @@
 class User {
     transient springSecurityService
 
-    public enum Status
+    enum Status
     {
-        active, inactive;
+        active, inactive
     }
 
-    Long id
     String idCode2
     String name
     //String givenname
@@ -21,14 +20,14 @@ class User {
         version false
     }
     static constraints = {
-        idCode2 blank: false, nullable: false, unique: true
+        idCode2 blank: false, unique: true
         name blank: true, nullable: true
         //givenname blank: true, nullable: true
         //surname blank: true, nullable: true
     }
 
     Set<Role> getAuthorities() {
-        UserRole.findAllByUser(this).collect { it.role }
+        UserRole.findAllByUser(this)*.role
     }
 
     def addRole(Role role) {

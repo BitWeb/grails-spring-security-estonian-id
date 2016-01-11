@@ -13,7 +13,6 @@ grails.plugin.springsecurity.estonianId.digiDocServiceAppServiceName = "Testimin
 //grails.plugin.springsecurity.estonianId.redirect.authFailUrl = "/j_spring_security_estonianid_redirect"
 //grails.plugin.springsecurity.estonianId.redirect.authSuccessUrl = "/test"*/
 
-// Added by the Spring Security Core plugin:
 grails {
         plugin {
                 springsecurity {

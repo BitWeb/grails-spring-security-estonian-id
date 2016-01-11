@@ -1,6 +1,6 @@
 package ee.bitweb.grails.springsecurity.estonianid
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.security.authentication.AuthenticationManager
@@ -21,9 +21,9 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 /**
- * Created by ivar on 12.11.15.
+ * @author ivar
  */
-@Log4j
+@Slf4j
 class MobileIdAuthenticationFilter extends GenericFilterBean implements ApplicationEventPublisherAware {
     String filterProcessesUrl
     AuthenticationManager authenticationManager
@@ -37,21 +37,20 @@ class MobileIdAuthenticationFilter extends GenericFilterBean implements Applicat
     Map localeToLangMap
 
     @Override
-    void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)  throws IOException,
-            ServletException {
-        HttpServletRequest request = (HttpServletRequest) req
-        HttpServletResponse response = (HttpServletResponse) resp
+    void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)  throws IOException, ServletException {
+        HttpServletRequest request = req
+        HttpServletResponse response = resp
 
         // If the request URI doesn't contain the filterProcessesUrl,
         // it isn't a request that should be handled by this filter
-        if(!request.getRequestURI().contains(filterProcessesUrl)) {
+        if(!request.requestURI.contains(filterProcessesUrl)) {
             chain.doFilter(request, response)
             return
         }
 
         log.debug('Request requires mobileId authentication')
 
-        Authentication token = SecurityContextHolder.getContext().getAuthentication()
+        Authentication token = SecurityContextHolder.context.authentication
 
         try {
             token = attemptAuthentication(request, token)
@@ -59,21 +58,17 @@ class MobileIdAuthenticationFilter extends GenericFilterBean implements Applicat
                 return
             }
             //sessionAuthenticationStrategy.onAuthentication(authentication, request, response)
+            successfulAuthentication(request, response, token)
         } catch(MobileIdAuthenticationOutstandingException ex) {
             insufficientAuthentication(request, response, ex)
-            return
         } catch(MobileIdAuthenticationException ex) {
             unsuccessfulAuthentication(request, response, ex)
-            return
         } catch(AuthenticationException ex) {
             unsuccessfulAuthentication(request, response, ex)
-            return
         }
-
-        successfulAuthentication(request, response, token)
     }
 
-    public Authentication attemptAuthentication(HttpServletRequest request, MobileIdAuthenticationToken token) throws AuthenticationException {
+    Authentication attemptAuthentication(HttpServletRequest request, MobileIdAuthenticationToken token) throws AuthenticationException {
         String phoneNo = obtainPhoneNo(request)?.trim()
 
         if(token == null) {
@@ -91,25 +86,25 @@ class MobileIdAuthenticationFilter extends GenericFilterBean implements Applicat
         }
         token.userLanguageCode = languageCode
 
-        return this.getAuthenticationManager().authenticate(token)
+        return authenticationManager.authenticate(token)
     }
 
     private void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        SecurityContextHolder.getContext().setAuthentication(authentication)
+        SecurityContextHolder.context.authentication = authentication
 
-        applicationEventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, this.getClass()))
+        applicationEventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, getClass()))
 
         authenticationSuccessHandler.onAuthenticationSuccess(request, response, authentication)
     }
 
-    private void insufficientAuthentication(HttpServletRequest request, HttpServletResponse response, MobileIdAuthenticationException ex) {
-        SecurityContextHolder.getContext().setAuthentication(ex.authentication)
-        authenticationFailureHandler.onAuthenticationFailure(request, response, ex)
+    private void insufficientAuthentication(HttpServletRequest request, HttpServletResponse response, MobileIdAuthenticationException e) {
+        SecurityContextHolder.context.authentication = e.authentication
+        authenticationFailureHandler.onAuthenticationFailure(request, response, e)
     }
 
-    private void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) {
+    private void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) {
         SecurityContextHolder.clearContext()
-        authenticationFailureHandler.onAuthenticationFailure(request, response, ex)
+        authenticationFailureHandler.onAuthenticationFailure(request, response, e)
     }
 
     private String obtainPhoneNo(HttpServletRequest request) {

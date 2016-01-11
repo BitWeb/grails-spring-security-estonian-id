@@ -1,23 +1,17 @@
 package ee.bitweb.grails.springsecurity.estonianid
 
-import ee.bitweb.grails.springsecurity.userdetails.GenericUserDetails
 import org.springframework.security.authentication.AuthenticationProvider
-import org.springframework.security.authentication.InsufficientAuthenticationException
-
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
-import groovy.util.logging.Log4j
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 
+import ee.bitweb.grails.springsecurity.userdetails.GenericUserDetails
 import ee.bitweb.grails.springsecurity.userdetails.GenericUserDetailsChecker
-
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider
+import groovy.util.logging.Slf4j
 
 /**
- * Created by ivar on 11.11.15.
+ * @author ivar
  */
-@Log4j
+@Slf4j
 class MobileIdAuthenticationProvider implements AuthenticationProvider {
 
     MobileIdAuthenticationService authenticationService
@@ -25,15 +19,15 @@ class MobileIdAuthenticationProvider implements AuthenticationProvider {
     List<String> defaultRoleNames
     boolean fCreateNewUsers
 
-    GenericUserDetailsChecker preAuthenticationChecks// = new DefaultEstonianIdPreAuthenticationChecks();
-    GenericUserDetailsChecker postAuthenticationChecks// = new DefaultEstonianIdPostAuthenticationChecks();
+    GenericUserDetailsChecker preAuthenticationChecks// = new DefaultEstonianIdPreAuthenticationChecks()
+    GenericUserDetailsChecker postAuthenticationChecks// = new DefaultEstonianIdPostAuthenticationChecks()
 
     @Override
     Authentication authenticate(Authentication auth) throws AuthenticationException {
-        MobileIdAuthenticationToken token = (MobileIdAuthenticationToken) auth
+        MobileIdAuthenticationToken token = auth
 
         //log.info 'Mobile Id try authenticate'
-        //this.preAuthenticationChecks.check(estonianIdUser);
+        //preAuthenticationChecks.check(estonianIdUser)
 
         if (!token.authSession) {
             token.authSession = authenticationService.beginAuthentication(token.userPhoneNo, token.userLanguageCode)
@@ -65,9 +59,9 @@ class MobileIdAuthenticationProvider implements AuthenticationProvider {
         token.userGivenname = token.authSession.userGivenname
         token.userSurname = token.authSession.userSurname
 
-        token.setAuthenticated(true)
+        token.authenticated = true
 
-        Object estonianIdUser = authenticationDao.findUser(token)
+        def estonianIdUser = authenticationDao.findUser(token)
 
         boolean fJustCreated = false
 
@@ -83,57 +77,53 @@ class MobileIdAuthenticationProvider implements AuthenticationProvider {
                 authenticationDao.updateFromToken(estonianIdUser, token)
             }
 
-            Object appUser = authenticationDao.getAppUser(estonianIdUser)
-            Object principal = authenticationDao.getPrincipal(appUser)
+            def appUser = authenticationDao.getAppUser(estonianIdUser)
+            def principal = authenticationDao.getPrincipal(appUser)
 
-            if (EstonianIdUserDetails.isAssignableFrom(principal.class)) {
-                token = new MobileIdAuthenticationToken(((EstonianIdUserDetails) principal).getAuthorities(), token.userPhoneNo, token.userLanguageCode, token.authSession)
+            if (principal instanceof EstonianIdUserDetails) {
+                token = new MobileIdAuthenticationToken(principal.authorities, token.userPhoneNo, token.userLanguageCode, token.authSession)
                 token.userIdCode = token.authSession.userIdCode
             } else {
                 token = new MobileIdAuthenticationToken(authenticationDao.getRoles(appUser), token.userPhoneNo, token.userLanguageCode, token.authSession)
                 token.userIdCode = token.authSession.userIdCode
             }
 
-            token.setAuthenticated(true)
+            token.authenticated = true
             token.details = null
             token.principal = principal
         } else {
             //TODO: Authentication without domain class?
         }
 
-        //this.postAuthenticationChecks.check(estonianIdUser);
+        //postAuthenticationChecks.check(estonianIdUser)
 
         return token
     }
 
     @Override
     boolean supports(Class<? extends Object> authentication) {
-        return MobileIdAuthenticationToken.class.isAssignableFrom(authentication)
+        return MobileIdAuthenticationToken.isAssignableFrom(authentication)
     }
 
     protected GenericUserDetails retrieveUser(Integer id, Authentication token) {
-        GenericUserDetails loadedUser
-
-        loadedUser = this.getUserDetailsService().loadById(id)
-
-        return loadedUser
+        userDetailsService.loadById(id)
         /*try {
-            loadedUser = this.getUserDetailsService().loadById(id);
+            loadedUser = userDetailsService.loadById(id)
         } catch (UsernameNotFoundException var6) {
-            if(token.getCredentials() != null) {
-                String presentedPassword = authentication.getCredentials().toString();
-                this.passwordEncoder.isPasswordValid(this.userNotFoundEncodedPassword, presentedPassword, (Object)null);
+            if(token.credentials != null) {
+                String presentedPassword = authentication.credentials
+                passwordEncoder.isPasswordValid(userNotFoundEncodedPassword, presentedPassword, (Object)null)
             }
 
-            throw var6;
+            throw var6
         } catch (Exception var7) {
-            throw new InternalAuthenticationServiceException(var7.getMessage(), var7);
+            throw new InternalAuthenticationServiceException(var7.message, var7)
         }
 
         if(loadedUser == null) {
-            throw new InternalAuthenticationServiceException("UserDetailsService returned null, which is an interface contract violation");
+            throw new InternalAuthenticationServiceException("UserDetailsService returned null, which is an interface contract violation")
         } else {
-            return loadedUser;
+            return loadedUser
         }*/
     }
 }

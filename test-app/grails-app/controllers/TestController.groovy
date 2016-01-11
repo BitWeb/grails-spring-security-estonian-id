@@ -2,14 +2,16 @@ import ee.bitweb.grails.springsecurity.GenericSecurityService
 
 import grails.plugin.springsecurity.annotation.Secured
 
-@Secured(['ROLE_DEFAULT'])
+@Secured('ROLE_DEFAULT')
 class TestController {
 
     GenericSecurityService genericSecurityService
 
     def index() {
-        log.info(genericSecurityService.getCurrentUser())
+        def user = genericSecurityService.currentUser
 
-        [currentUser: genericSecurityService.getCurrentUser()]
+        log.info(user)
+
+        [currentUser: user]
     }
 }

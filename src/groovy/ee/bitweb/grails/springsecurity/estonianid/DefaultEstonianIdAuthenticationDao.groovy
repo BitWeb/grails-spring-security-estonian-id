@@ -1,25 +1,24 @@
 package ee.bitweb.grails.springsecurity.estonianid
 
-import org.apache.log4j.Logger
-import org.codehaus.groovy.grails.commons.GrailsApplication
 import grails.plugin.springsecurity.SpringSecurityUtils
+import groovy.util.logging.Slf4j
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.plugins.support.aware.GrailsApplicationAware
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.GrantedAuthorityImpl
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 import java.lang.reflect.Method
 
 /**
- * Created by ivar on 12.11.15.
+ * @author ivar
  */
+@Slf4j
 class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao, InitializingBean, ApplicationContextAware, GrailsApplicationAware {
-
-    private static def log = Logger.getLogger(this)
 
     GrailsApplication grailsApplication
     ApplicationContext applicationContext
@@ -42,15 +41,13 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
 
     List<String> defaultRoleNames
 
-    Object findUser(EstonianIdAuthenticationToken token) {
-        Object user = null
+    def findUser(EstonianIdAuthenticationToken token) {
         EstonianIdUserClass.withTransaction {
-            user = EstonianIdUserClass.findWhere((estonainIdUserIdCodeProperty): token.userIdCode)
+            return EstonianIdUserClass.findWhere((estonainIdUserIdCodeProperty): token.userIdCode)
         }
-        return user
     }
 
-    void fillEstonianIdUserDetails(def user, EstonianIdAuthenticationToken token) {
+    void fillEstonianIdUserDetails(user, EstonianIdAuthenticationToken token) {
         if (user.hasProperty(estonainIdUserIdCodeProperty)) {
             user.properties[estonainIdUserIdCodeProperty] = token.userIdCode
         }
@@ -65,17 +62,17 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
         }
     }
 
-    void fillAppUserDetails(def appUser, EstonianIdAuthenticationToken token) {
+    void fillAppUserDetails(appUser, EstonianIdAuthenticationToken token) {
         def securityConf = SpringSecurityUtils.securityConfig
 
         //
     }
 
-    Object create(EstonianIdAuthenticationToken token) {
+    def create(EstonianIdAuthenticationToken token) {
         def securityConf = SpringSecurityUtils.securityConfig
 
-        def estonianIdUser = null
-        def appUser = null
+        def estonianIdUser
+        def appUser
 
         if (isSameDomain()) {
             estonianIdUser = grailsApplication.getDomainClass(EstonianIdUserClass.name).newInstance()
@@ -83,8 +80,7 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
             fillAppUserDetails(estonianIdUser, token)
 
             if (estonianIdUser.hasProperty('timeCreated') && estonianIdUser.hasProperty('timeUpdated')) {
-                estonianIdUser.timeCreated = new Date()
-                estonianIdUser.timeUpdated = new Date()
+                estonianIdUser.timeCreated = estonianIdUser.timeUpdated = new Date()
             }
 
             appUser = estonianIdUser
@@ -96,8 +92,7 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
             fillAppUserDetails(appUser, token)
 
             if (appUser.hasProperty('timeCreated') && appUser.hasProperty('timeUpdated')) {
-                appUser.timeCreated = new Date()
-                appUser.timeUpdated = new Date()
+                appUser.timeCreated = appUser.timeUpdated = new Date()
             }
 
             AppUserClass.withTransaction {
@@ -127,10 +122,10 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
         return estonianIdUser
     }
 
-    void updateFromToken(Object estonianIdUser, EstonianIdAuthenticationToken token) {
+    void updateFromToken(estonianIdUser, EstonianIdAuthenticationToken token) {
         EstonianIdUserClass.withTransaction {
             try {
-                if (!estonianIdUser.isAttached()) {
+                if (!estonianIdUser.attached) {
                     estonianIdUser.attach()
                 }
                 boolean update = false
@@ -169,13 +164,13 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
         }
     }
 
-    Object getAppUser(Object user) {
+    def getAppUser(user) {
         if (EstonianIdUserClass == AppUserClass) {
             return user
         }
-        def result = null
+        def result
         AppUserClass.withTransaction {
-            if (!user.isAttached()) {
+            if (!user.attached) {
                 user.attach()
             }
             result = user.getProperty(estonainIdAppUserConnectionPropertyName)
@@ -183,7 +178,7 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
         return result
     }
 
-    Object getPrincipal(Object appUser) {
+    def getPrincipal(appUser) {
         if (estonianIdUserDetailsService) {
             return estonianIdUserDetailsService.createUserDetails(appUser, getRoles(appUser))
         } else {
@@ -194,9 +189,9 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
         return appUser
     }
 
-    Collection<GrantedAuthority> getRoles(Object user) {
-        if (UserDetails.isAssignableFrom(user.class)) {
-            return ((UserDetails)user).getAuthorities()
+    Collection<GrantedAuthority> getRoles(user) {
+        if (user instanceof UserDetails) {
+            return user.authorities
         }
 
         def conf = SpringSecurityUtils.securityConfig
@@ -217,9 +212,9 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
         }
         return roles.collect {
             if (it instanceof String) {
-                return new GrantedAuthorityImpl(it.toString())
+                return new SimpleGrantedAuthority(it.toString())
             } else {
-                new GrantedAuthorityImpl(it.getProperty(conf.authority.nameField))
+                new SimpleGrantedAuthority(it.getProperty(conf.authority.nameField))
             }
         }
     }
@@ -228,28 +223,28 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
         return AppUserClass == EstonianIdUserClass
     }
 
-    void afterPropertiesSet() throws Exception {
+    void afterPropertiesSet() {
         log.debug("Init default EstonianId Authentication Dao...")
 
-        if (coreUserDetailsService != null) {
-            Method m = coreUserDetailsService.class.declaredMethods.find { it.name == 'createUserDetails' }
+        if (coreUserDetailsService) {
+            Method m = coreUserDetailsService.getClass().declaredMethods.find { it.name == 'createUserDetails' }
             if (!m) {
                 log.warn("UserDetailsService from spring-security-core don't have method 'createUserDetails()'. Class: ${coreUserDetailsService.getClass()}")
                 coreUserDetailsService = null
             } else {
-                m.setAccessible(true)
+                m.accessible = true
             }
         } else {
             log.warn("No UserDetailsService bean from spring-security-core")
         }
 
-        if (EstonianIdUserClass == null) {
+        if (!EstonianIdUserClass) {
             EstonianIdUserClass = grailsApplication.getDomainClass(estonianIdUserClassName)?.clazz
             if (!EstonianIdUserClass) {
                 log.error("Can't find domain: $estonianIdUserClassName")
             }
         }
-        if (AppUserClass == null) {
+        if (!AppUserClass) {
             if (appUserClassName && appUserClassName.length() > 0) {
                 AppUserClass = grailsApplication.getDomainClass(appUserClassName)?.clazz
             }
@@ -257,13 +252,11 @@ class DefaultEstonianIdAuthenticationDao implements EstonianIdAuthenticationDao,
                 log.error("Can't find domain: $appUserClassName")
             }
         }
-        if (EstonianIdUserClass == null && AppUserClass != null) {
+        if (!EstonianIdUserClass && !AppUserClass) {
             log.info("Use $AppUserClass to store EstonianId Authentication")
             EstonianIdUserClass = AppUserClass
-        } else if (EstonianIdUserClass != null && AppUserClass == null) {
+        } else if (EstonianIdUserClass && !AppUserClass) {
             AppUserClass = EstonianIdUserClass
-        } else if(EstonianIdUserClass == null && AppUserClass == null) {
-
         }
         log.debug("EstonianId Authentication Dao is ready.")
     }

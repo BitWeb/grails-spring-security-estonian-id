@@ -1,12 +1,10 @@
 package ee.bitweb.grails.springsecurity.estonianid
 
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 /**
- * Created by ivar on 12.11.15.
+ * @author ivar
  */
 class MobileIdAuthenticationToken extends EstonianIdAuthenticationToken {
 
@@ -14,15 +12,13 @@ class MobileIdAuthenticationToken extends EstonianIdAuthenticationToken {
     String userLanguageCode
     MobileIdAuthenticationSession authSession
 
-    public MobileIdAuthenticationToken(Collection<? extends GrantedAuthority> authorities, String phoneNo, String userLanguageCode, MobileIdAuthenticationSession authSession) {
+    MobileIdAuthenticationToken(Collection<? extends GrantedAuthority> authorities, String phoneNo, String userLanguageCode, MobileIdAuthenticationSession authSession) {
         super(authorities)
-        this.userPhoneNo = phoneNo
+        userPhoneNo = phoneNo
         this.authSession = authSession
     }
 
-    public MobileIdAuthenticationToken(String phoneNo, String userLanguageCode = 'EST') {
-        super(AuthorityUtils.NO_AUTHORITIES)
-        this.userPhoneNo = phoneNo
-        this.userLanguageCode = userLanguageCode
+    MobileIdAuthenticationToken(String phoneNo, String userLanguageCode = 'EST') {
+        this(AuthorityUtils.NO_AUTHORITIES, phoneNo, userLanguageCode, null)
     }
 }

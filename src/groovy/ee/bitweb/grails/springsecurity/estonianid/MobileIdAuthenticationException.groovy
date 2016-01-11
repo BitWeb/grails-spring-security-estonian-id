@@ -3,7 +3,7 @@ package ee.bitweb.grails.springsecurity.estonianid
 import org.springframework.security.core.AuthenticationException
 
 /**
- * Created by ivar on 12.11.15.
+ * @author ivar
  */
 class MobileIdAuthenticationException extends AuthenticationException {
     Date timeStarted
@@ -14,13 +14,12 @@ class MobileIdAuthenticationException extends AuthenticationException {
 
     MobileIdAuthenticationToken token
 
-    public MobileIdAuthenticationException(String msg, MobileIdAuthenticationToken token, Throwable t) {
+    MobileIdAuthenticationException(String msg, MobileIdAuthenticationToken token, Throwable t) {
         super(msg, t)
         this.token = token
     }
 
-    public MobileIdAuthenticationException(String msg, MobileIdAuthenticationToken token) {
-        super(msg)
-        this.token = token
+    MobileIdAuthenticationException(String msg, MobileIdAuthenticationToken token) {
+        this(msg, token, null)
     }
 }

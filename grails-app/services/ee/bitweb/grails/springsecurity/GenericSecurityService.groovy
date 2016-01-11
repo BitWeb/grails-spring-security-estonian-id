@@ -1,20 +1,11 @@
 package ee.bitweb.grails.springsecurity
 
+import ee.bitweb.grails.springsecurity.userdetails.GenericUser
 import grails.plugin.springsecurity.SpringSecurityService
 
-import grails.plugin.springsecurity.SpringSecurityUtils
-import ee.bitweb.grails.springsecurity.userdetails.GenericUser
-import grails.transaction.Transactional
-import org.springframework.util.Assert
-
-import javax.servlet.http.HttpServletRequest
-
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder as SCH
-import org.springframework.util.Assert
-
-
 class GenericSecurityService extends SpringSecurityService {
+
+    static transactional = false
 
     @Override
     def getCurrentUser() {
@@ -50,7 +41,7 @@ class GenericSecurityService extends SpringSecurityService {
         }
 
         // load() requires an id, so this only works if there's an id property in the principal
-        Assert.isInstanceOf GenericUser, principal
+        assert principal instanceof GenericUser
 
         getClassForName(securityConfig.userLookup.userDomainClassName).load(currentUserId)
     }

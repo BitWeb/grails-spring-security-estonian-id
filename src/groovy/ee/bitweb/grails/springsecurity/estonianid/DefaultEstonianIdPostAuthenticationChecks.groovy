@@ -2,22 +2,18 @@ package ee.bitweb.grails.springsecurity.estonianid
 
 import ee.bitweb.grails.springsecurity.userdetails.GenericUserDetails
 import ee.bitweb.grails.springsecurity.userdetails.GenericUserDetailsChecker
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 
 /**
- * Created by ivar on 18.11.15.
+ * @author ivar
  */
-@Log4j
+@Slf4j
 class DefaultEstonianIdPostAuthenticationChecks implements GenericUserDetailsChecker {
-    public DefaultEstonianIdPostAuthenticationChecks() {
-
-    }
-
-    public void check(GenericUserDetails user) {
+    void check(GenericUserDetails user) {
         log.debug('........................post authentication checks')
-        /*if(!user.isCredentialsNonExpired()) {
-            AbstractUserDetailsAuthenticationProvider.this.logger.debug("User account credentials have expired");
-            throw new CredentialsExpiredException(AbstractUserDetailsAuthenticationProvider.this.messages.getMessage("AbstractUserDetailsAuthenticationProvider.credentialsExpired", "User credentials have expired"), user);
+        /*if(!user.credentialsNonExpired) {
+            AbstractUserDetailsAuthenticationProvider.this.logger.debug("User account credentials have expired")
+            throw new CredentialsExpiredException(AbstractUserDetailsAuthenticationProvider.this.messages.getMessage("AbstractUserDetailsAuthenticationProvider.credentialsExpired", "User credentials have expired"), user)
         }*/
     }
 }

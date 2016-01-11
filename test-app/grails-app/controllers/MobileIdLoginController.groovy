@@ -13,9 +13,10 @@ class MobileIdLoginController {
         log.info config.estonianId.domain.estonianIdUserClassName
         log.info config.estonianId.redirect.authSuccessUrl
 
-        render(view: 'index', model: [authIdCardUrl: authIdCardUrl,
-                                      authMobileIdUrl: authMobileIdUrl,
-                                      authSuccessUrl: authSuccessUrl,
-                                      domainClass: config.userLookup.userDomainClassName, authFailUrl: config.redirect.authFailUrl])
+        [authIdCardUrl: authIdCardUrl,
+         authMobileIdUrl: authMobileIdUrl,
+         authSuccessUrl: authSuccessUrl,
+         domainClass: config.userLookup.userDomainClassName,
+         authFailUrl: config.redirect.authFailUrl])
     }
 }

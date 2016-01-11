@@ -11,19 +11,17 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 /**
- * Created by Ivar on 13.11.2015.
+ * @author Ivar
  */
 class IdCardAuthenticationHandler implements AuthenticationSuccessHandler, AuthenticationFailureHandler {
 
-    void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) throws IOException, ServletException {
+    void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
         response.status = HttpServletResponse.SC_UNAUTHORIZED
 
-        JSON json = new JSON([status: 'BAD_CERTIFICATE'])
-        json.render(response)
+        new JSON([status: 'BAD_CERTIFICATE']).render(response)
     }
 
-    void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        JSON json = new JSON([status: 'SUCCESS'])
-        json.render(response)
+    void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication a) throws IOException, ServletException {
+        new JSON([status: 'SUCCESS']).render(response)
     }
 }

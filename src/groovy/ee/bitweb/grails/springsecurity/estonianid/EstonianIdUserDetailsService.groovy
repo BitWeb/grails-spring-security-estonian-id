@@ -4,17 +4,17 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import org.springframework.security.core.GrantedAuthority
 
 /**
- * Created by ivar on 16.11.15.
+ * @author ivar
  */
 class EstonianIdUserDetailsService {
-    protected EstonianIdUserDetails createUserDetails(user, Collection<GrantedAuthority> authorities) {
+    EstonianIdUserDetails createUserDetails(user, Collection<GrantedAuthority> authorities) {
 
-        def conf = SpringSecurityUtils.securityConfig
+        def conf = SpringSecurityUtils.securityConfig.estonianId.domain
 
-        String idCodePropertyName = conf.estonianId.domain.estonainIdUserIdCodeProperty
-        String givennamePropertyName = conf.estonianId.domain.estonainIdUserGivennameProperty
-        String surnamePropertyName = conf.estonianId.domain.estonainIdUserSurnameProperty
-        String screenNamePropertyName = conf.estonianId.domain.estonainIdUserScreenNameProperty
+        String idCodePropertyName = conf.estonainIdUserIdCodeProperty
+        String givennamePropertyName = conf.estonainIdUserGivennameProperty
+        String surnamePropertyName = conf.estonainIdUserSurnameProperty
+        String screenNamePropertyName = conf.estonainIdUserScreenNameProperty
 
         String idCode = ''
         String givenname = ''

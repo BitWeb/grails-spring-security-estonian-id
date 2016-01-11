@@ -1,6 +1,6 @@
 package ee.bitweb.grails.springsecurity.estonianid
 
-import groovy.util.logging.Log4j
+import groovy.util.logging.Slf4j
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.security.authentication.AuthenticationManager
@@ -19,17 +19,17 @@ import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-
-import java.security.cert.X509Certificate
-import java.security.cert.CertificateFactory
 import javax.xml.bind.DatatypeConverter
+
+import java.security.cert.CertificateFactory
+import java.security.cert.X509Certificate
 
 import sun.security.provider.X509Factory
 
 /**
- * Created by ivar on 12.11.15.
+ * @author ivar
  */
-@Log4j
+@Slf4j
 class IdCardAuthenticationFilter extends GenericFilterBean implements ApplicationEventPublisherAware {
     String filterProcessesUrl
     AuthenticationManager authenticationManager
@@ -42,14 +42,13 @@ class IdCardAuthenticationFilter extends GenericFilterBean implements Applicatio
     String clientCertHeaderName
 
     @Override
-    void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)  throws IOException,
-            ServletException {
-        HttpServletRequest request = (HttpServletRequest) req
-        HttpServletResponse response = (HttpServletResponse) resp
+    void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)  throws IOException, ServletException {
+        HttpServletRequest request = req
+        HttpServletResponse response = resp
 
         // If the request URI doesn't contain the filterProcessesUrl,
         // it isn't a request that should be handled by this filter
-        if(!request.getRequestURI().contains(filterProcessesUrl)) {
+        if(!request.requestURI.contains(filterProcessesUrl)) {
             chain.doFilter(request, response)
             return
         }
@@ -64,25 +63,20 @@ class IdCardAuthenticationFilter extends GenericFilterBean implements Applicatio
                 return
             }
             //sessionAuthenticationStrategy.onAuthentication(authentication, request, response)
+            successfulAuthentication(request, response, token)
 
-        } catch(IdCardAuthenticationException ex) {
-            unsuccessfulAuthentication(request, response, ex)
-            return
-        } catch(AuthenticationException ex) {
-            unsuccessfulAuthentication(request, response, ex)
-            return
+        } catch(IdCardAuthenticationException e) {
+            unsuccessfulAuthentication(request, response, e)
+        } catch(AuthenticationException e) {
+            unsuccessfulAuthentication(request, response, e)
         }
-
-        successfulAuthentication(request, response, token)
     }
 
-    public Authentication attemptAuthentication(HttpServletRequest request) throws AuthenticationException {
+    Authentication attemptAuthentication(HttpServletRequest request) throws AuthenticationException {
         log.debug 'attempting authentication'
 
         X509Certificate cert = obtainCert(request)
-
-        IdCardAuthenticationToken token = new IdCardAuthenticationToken(cert)
-        return this.getAuthenticationManager().authenticate(token)
+        return authenticationManager.authenticate(new IdCardAuthenticationToken(cert))
     }
 
     private void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
@@ -90,37 +84,37 @@ class IdCardAuthenticationFilter extends GenericFilterBean implements Applicatio
 
         // When a populated Authentication object is placed in the SecurityContextHolder,
         // the user is authenticated.
-        SecurityContextHolder.getContext().setAuthentication(authentication)
+        SecurityContextHolder.context.authentication = authentication
 
-        applicationEventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, this.getClass()))
+        applicationEventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authentication, getClass()))
 
         authenticationSuccessHandler.onAuthenticationSuccess(request, response, authentication)
     }
 
-    private void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex) {
+    private void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) {
         SecurityContextHolder.clearContext()
-        log.debug('IdCard authentication failed: ' + ex.toString())
-        authenticationFailureHandler.onAuthenticationFailure(request, response, ex)
+        log.debug("IdCard authentication failed: $e")
+        authenticationFailureHandler.onAuthenticationFailure(request, response, e)
     }
 
     private X509Certificate obtainCert(HttpServletRequest request) {
         if(fGetClientCertFromHeader) {
-            X509Certificate cert = null
+            X509Certificate cert
 
             String certStr = request.getHeader(clientCertHeaderName)
 
-            if(certStr && certStr.length()) {
+            if(certStr?.length()) {
                 byte[] certArr = DatatypeConverter.parseBase64Binary(certStr.replaceAll(X509Factory.BEGIN_CERT, "").replaceAll(X509Factory.END_CERT, ""))
 
-                cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(certArr))
+                cert = CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(certArr))
             } else {
                 log.debug 'No client certificate'
             }
 
             return cert
         } else {
-            X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate")
-            if(certs && certs.size()) {
+            X509Certificate[] certs = request.getAttribute("javax.servlet.request.X509Certificate")
+            if(certs) {
                 return certs[0]
             } else {
                 log.debug 'No client certificate'
